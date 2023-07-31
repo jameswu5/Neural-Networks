@@ -16,13 +16,36 @@ namespace RecurrentNeuralnetwork {
                 {5, 6, 7, 8}
             };
 
-            Matrix.Display(Matrix.MatrixMultiply(matrix1, matrix2));
+            double[,] matrix3 = {
+                {0, 1},
+                {2, 3},
+                {4, 5}
+            };
+
+            // Matrix.Display(Matrix.MatrixMultiply(matrix1, matrix2));
+
+            // Matrix.Display(Matrix.Subtract(matrix1, matrix3));
+            // Console.WriteLine();
+            // Matrix.Display(matrix1);
+
 
             double[] vector1 = {3, 5, 6};
             double[] vector2 = {1, 6.5, 2};
             Console.WriteLine(Matrix.DotProduct(vector1, vector2));
 
-            Matrix.Display(Matrix.Transpose(matrix1));
+            // Matrix.Display(Matrix.Transpose(matrix1));
+
+            double[] soft = Activation.Softmax(vector1);
+            double[] tanh = Activation.Tanh(vector1);
+
+            foreach (double s in tanh) {
+                Console.WriteLine(s);
+            }
+
+
+            double[] vector3 = {0.15, 0.23, 0.62};
+            double[] vector4 = {0.9, 0.1, 0};
+            // Console.WriteLine(Loss.CrossEntropy(vector3, vector4));
         }
     }
 }

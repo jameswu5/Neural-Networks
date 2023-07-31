@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,17 +9,23 @@ namespace RecurrentNeuralnetwork {
         // matrix1 + matrix2
         public static double[,] Add(double[,] matrix1, double[,] matrix2) {
 
+
             if (matrix1.GetLength(0) != matrix2.GetLength(0) || matrix1.GetLength(1) != matrix2.GetLength(1)) {
                 throw new ArgumentException("Matrix sizes are not compatible");
             }
+            
+            int m = matrix1.GetLength(0);
+            int n = matrix1.GetLength(1);
 
-            for (int i = 0; i < matrix2.GetLength(0); i++) {
-                for (int j = 0; j < matrix2.GetLength(1); j++) {
-                    matrix1[i,j] += matrix2[i,j];
+            double[,] result = new double[m, n];
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    result[i, j] = matrix1[i,j] + matrix2[i,j];
                 }
             }
 
-            return matrix1;
+            return result;
         }
 
         // matrix1 - matrix2
@@ -29,25 +33,35 @@ namespace RecurrentNeuralnetwork {
             if (matrix1.GetLength(0) != matrix2.GetLength(0) || matrix1.GetLength(1) != matrix2.GetLength(1)) {
                 throw new ArgumentException("Matrix sizes are not compatible");
             }
+            
+            int m = matrix1.GetLength(0);
+            int n = matrix1.GetLength(1);
 
-            for (int i = 0; i < matrix2.GetLength(0); i++) {
-                for (int j = 0; j < matrix2.GetLength(1); j++) {
-                    matrix1[i,j] -= matrix2[i,j];
+            double[,] result = new double[m, n];
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    result[i, j] = matrix1[i,j] - matrix2[i,j];
                 }
             }
 
-            return matrix1;
+            return result;
         }
     
         // a * matrix
         public static double[,] ScalarMultiply(double[,] matrix, double scalar) {
-            for (int i = 0; i < matrix.GetLength(0); i++) {
-                for (int j = 0; j < matrix.GetLength(1); j++) {
-                    matrix[i,j] *= scalar;
+            int m = matrix.GetLength(0);
+            int n = matrix.GetLength(1);
+
+            double[,] result = new double[m,n];
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    result[i,j] = matrix[i,j] * scalar;
                 }
             }
 
-            return matrix;
+            return result;
         }
 
         // matrix1 * matrix2 (standard O(n^3) algorithm, might be able to optimise)
@@ -108,6 +122,55 @@ namespace RecurrentNeuralnetwork {
                 }
                 Console.WriteLine();
             }
+        }
+    }
+
+
+    public static class Activation {
+
+        public static double[] Tanh(double[] vector) {
+            int n = vector.Length;
+            double[] result = new double[n];
+            for (int i = 0; i < n; i++) {
+                result[i] = Math.Tanh(vector[i]);
+            }
+            return result;
+        }
+
+        // this avoids overflow
+        public static double[] Softmax(double[] vector) {
+            int n = vector.Length;
+            double maxValue = vector.Max();
+
+            double[] result = new double[n];
+
+            for (int i = 0; i < n; i++) {
+                result[i] = Math.Exp(vector[i] - maxValue);
+            }
+            double sum = result.Sum();
+
+            for (int i = 0; i < n; i++) {
+                result[i] = result[i] / sum;
+            }
+
+            return result;
+        }
+    }
+
+    public static class Loss {
+
+        public static double CrossEntropy(double[] vector, double[] target) {
+            if (vector.Length != target.Length) {
+                throw new ArgumentException("Vector sizes are not the same");
+            }
+
+            double result = 0;
+
+            for (int i = 0; i < vector.Length; i++) {
+                result -= target[i] * Math.Log2(vector[i]);
+            }
+
+            return result;
         }
 
     }

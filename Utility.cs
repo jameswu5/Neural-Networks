@@ -28,6 +28,30 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
 
+        public static double[] Add(double[] vector1, double[] vector2) {
+            if (vector1.Length != vector2.Length) {
+                throw new ArgumentException("vector lengths don't match");
+            }
+
+            double[] result = new double[vector1.Length];
+            for (int i = 0; i < vector1.Length; i++) {
+                result[i] = vector1[i] + vector2[i];
+            }
+            return result;
+        }
+
+        public static double[] Add(double[] vector1, double[] vector2, double[] vector3) {
+            if (!(vector1.Length == vector2.Length && vector1.Length == vector3.Length)) {
+                throw new ArgumentException("vector lengths don't match");
+            }
+
+            double[] result = new double[vector1.Length];
+            for (int i = 0; i < vector1.Length; i++) {
+                result[i] = vector1[i] + vector2[i] + vector3[i];
+            }
+            return result;
+        }
+
         // matrix1 - matrix2
         public static double[,] Subtract(double[,] matrix1, double[,] matrix2) {
             if (matrix1.GetLength(0) != matrix2.GetLength(0) || matrix1.GetLength(1) != matrix2.GetLength(1)) {
@@ -87,6 +111,22 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
 
+        public static double[] MatrixMultiply(double[,] matrix, double[] vector) {
+            if (vector.Length != matrix.GetLength(1)) {
+                throw new ArgumentException($"Matrix [{matrix.GetLength(1)}] and vector [{vector.Length}] size not compatible");
+            }
+
+            double[] result = new double[matrix.GetLength(0)];
+            for (int i = 0; i < matrix.GetLength(0); i++) {
+                for (int j = 0; j < vector.Length; j++) {
+                    result[i] += matrix[i,j] * vector[j];
+                }
+            }
+
+            return result;
+        }
+
+
         public static double DotProduct(double[] vector1, double[] vector2) {
             if (vector1.Length != vector2.Length) {
                 throw new ArgumentException("Vector sizes are not the same");
@@ -123,6 +163,29 @@ namespace RecurrentNeuralnetwork {
                 Console.WriteLine();
             }
         }
+    
+        public static void Display(double[] vector) {
+            foreach (double v in vector) {
+                Console.Write($"{v} ");
+            }
+            Console.WriteLine();
+        }
+    
+        public static double[,] InitialiseWeights(int m, int n) {
+            double[,] weights = new double[m,n];
+
+            Random rng = new Random();
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    double val = (rng.NextDouble() - 0.5) * 2 / Math.Sqrt(n);
+                    weights[i,j] = val;
+                }
+            }
+
+            return weights;
+        }
+    
+    
     }
 
 

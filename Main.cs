@@ -49,11 +49,12 @@ namespace RecurrentNeuralnetwork {
             double[] vector4 = {0.9, 0.1, 0};
             // Console.WriteLine(Loss.CrossEntropy(vector3, vector4));
 
-            char[] vector5 = {'a', 'b', 'c', 'd'};
+            char[] vector5 = {'a', 'c', 'b', 'd'};
             double[] vector6 = {0, 0, 0};
 
             Network nn = new Network(4, 3, 5, 0.1);
-            Matrix.Display(nn.ForwardPropogate(vector5, vector6));
+            var states = nn.ForwardPropogate(vector5, vector6);
+
         }
     }
 }

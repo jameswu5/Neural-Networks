@@ -32,7 +32,8 @@ namespace RecurrentNeuralnetwork {
             biasC = new double[outputSize];
         }
 
-        public double[][] ForwardPropogate(char[] input, double[] previousHiddenState) {
+        // public double[][] ForwardPropogate(char[] input, double[] previousHiddenState) {
+        public (double[][] inputStates, double[][] hiddenStates, double[][] outputStates) ForwardPropogate(char[] input, double[] previousHiddenState) {
 
             int n = input.Length;
             double[][] inputStates = new double[n][];
@@ -57,7 +58,7 @@ namespace RecurrentNeuralnetwork {
                 outputStates[time] = Activation.Softmax(o);
             }
 
-            return outputStates;
+            return (inputStates, hiddenStates, outputStates);
         }
     }
 }

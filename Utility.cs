@@ -6,7 +6,7 @@ using System.Linq;
 namespace RecurrentNeuralnetwork {
     public static class Matrix {
 
-        // matrix1 + matrix2
+        // Add has 3 overloads so far
         public static double[,] Add(double[,] matrix1, double[,] matrix2) {
 
 
@@ -126,7 +126,6 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
 
-
         public static double DotProduct(double[] vector1, double[] vector2) {
             if (vector1.Length != vector2.Length) {
                 throw new ArgumentException("Vector sizes are not the same");
@@ -164,6 +163,16 @@ namespace RecurrentNeuralnetwork {
             }
         }
     
+        public static void Display(double[][] matrix) {
+            for (int i = 0; i < matrix.Length; i++) {
+                for (int j = 0; j < matrix[i].Length; j++) {
+                    Console.Write(matrix[i][j]);
+                    Console.Write(" ");
+                }
+                Console.WriteLine();
+            }
+        }
+
         public static void Display(double[] vector) {
             foreach (double v in vector) {
                 Console.Write($"{v} ");
@@ -184,7 +193,6 @@ namespace RecurrentNeuralnetwork {
 
             return weights;
         }
-    
     
     }
 

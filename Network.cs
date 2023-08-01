@@ -32,15 +32,32 @@ namespace RecurrentNeuralnetwork {
             biasC = new double[outputSize];
         }
 
-        public double[] ForwardPropogate(double[] input, double[] previousHiddenState) {
-            // We can remove the intermediate steps to reduce memory use, at the expense of readability
-            double[] Wh = Matrix.MatrixMultiply(weightsW, previousHiddenState);
-            double[] Ux = Matrix.MatrixMultiply(weightsU, input);
-            double[] a = Matrix.Add(biasB, Wh, Ux);
-            double[] h = Activation.Tanh(a);
-            double[] o = Matrix.Add(biasC, Matrix.MatrixMultiply(weightsV, h));
-            double[] yHat = Activation.Softmax(o);
-            return yHat;
+        public double[][] ForwardPropogate(char[] input, double[] previousHiddenState) {
+
+            int n = input.Length;
+            double[][] inputStates = new double[n][];
+            double[][] hiddenStates = new double[n][];
+            double[][] outputStates = new double[n][];
+
+            for (int time = 0; time < n; time++) {
+                inputStates[time] = new double[vocabSize];
+                inputStates[time][input[time] - 'a'] = 1;
+
+                double[] Wh;
+                if (time == 0) {
+                    Wh = Matrix.MatrixMultiply(weightsW, previousHiddenState);
+                } else {
+                    Wh = Matrix.MatrixMultiply(weightsW, hiddenStates[time - 1]);
+                }
+                double[] Ux = Matrix.MatrixMultiply(weightsU, inputStates[time]);
+                double[] a = Matrix.Add(biasB, Wh, Ux);
+                hiddenStates[time] = Activation.Tanh(a);
+
+                double[] o = Matrix.Add(biasC, Matrix.MatrixMultiply(weightsV, hiddenStates[time]));
+                outputStates[time] = Activation.Softmax(o);
+            }
+
+            return outputStates;
         }
     }
 }

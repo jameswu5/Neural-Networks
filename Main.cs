@@ -53,7 +53,7 @@ namespace RecurrentNeuralnetwork {
             double[] vector6 = {0, 0, 0, 0, 0, 0};
 
             Network nn = new Network(26, 6, 5, 0.1);
-            var states = nn.ForwardPropagate(vector5, vector6);
+            var states = nn.ForwardPropagate(vector5);
 
             int target = 1;
 
@@ -65,7 +65,6 @@ namespace RecurrentNeuralnetwork {
             Console.WriteLine();
             Matrix.Display(backStates.db);
             Console.WriteLine();
-            
         }
     }
 }

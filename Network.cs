@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace RecurrentNeuralnetwork {
     public class Network {
-
         int vocabSize;
         int hiddenSize;
         int outputSize;
@@ -35,14 +34,12 @@ namespace RecurrentNeuralnetwork {
             biasC = new double[outputSize];
 
             sequenceLength = 0;
-
             previousHiddenState = new double[hiddenSize];
         }
 
         // This is for a char based recurrent neural network
-        public (double[][] inputStates, double[][] hiddenStates, double[][] outputStates) ForwardPropagate(int[] input, double[] previousHiddenState) {
+        public (double[][] inputStates, double[][] hiddenStates, double[][] outputStates) ForwardPropagate(int[] input) {
             sequenceLength = input.Length;
-            this.previousHiddenState = previousHiddenState;
 
             double[][] inputStates = new double[sequenceLength][];
             double[][] hiddenStates = new double[sequenceLength][];
@@ -115,6 +112,5 @@ namespace RecurrentNeuralnetwork {
             biasB = Matrix.Add(biasB, Matrix.ScalarMultiply(db, -learnRate));
             biasC = Matrix.Add(biasC, Matrix.ScalarMultiply(dc, -learnRate));
         }
-
     }
 }

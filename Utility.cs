@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-
 namespace RecurrentNeuralnetwork {
     public static class Matrix {
 
-        // Add has 3 overloads so far
         public static double[,] Add(double[,] matrix1, double[,] matrix2) {
 
 
@@ -52,6 +50,27 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
 
+        public static double[,] Add(double[,] matrix, double scalar) {
+            int m = matrix.GetLength(0);
+            int n = matrix.GetLength(1);
+            double[,] result = new double[m, n];
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    result[i, j] = matrix[i, j] + scalar;
+                }
+            }
+            return result;
+        }
+
+        public static double[] Add(double[] vector, double scalar) {
+            int n = vector.Length;
+            double[] result = new double[n];
+            for (int i = 0; i < n; i++) {
+                result[i] = vector[i] + scalar;
+            }
+            return result;
+        }
+
         // matrix1 - matrix2
         public static double[,] Subtract(double[,] matrix1, double[,] matrix2) {
             if (matrix1.GetLength(0) != matrix2.GetLength(0) || matrix1.GetLength(1) != matrix2.GetLength(1)) {
@@ -88,6 +107,15 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
 
+        public static double[] ScalarMultiply(double[] vector, double scalar) {
+            int n = vector.Length;
+            double[] result = new double[n];
+            for (int i = 0; i < n; i++) {
+                result[i] = vector[i] * scalar;
+            }
+            return result;
+        }
+
         // matrix1 * matrix2 (standard O(n^3) algorithm, might be able to optimise)
         public static double[,] MatrixMultiply(double[,] matrix1, double[,] matrix2) {
             int rows1 = matrix1.GetLength(0);
@@ -120,6 +148,21 @@ namespace RecurrentNeuralnetwork {
             for (int i = 0; i < matrix.GetLength(0); i++) {
                 for (int j = 0; j < vector.Length; j++) {
                     result[i] += matrix[i,j] * vector[j];
+                }
+            }
+
+            return result;
+        }
+
+        // vector1 column vector, vector2 row vector, multiply to get matrix
+        public static double[,] MatrixMultiply(double[] vector1, double[] vector2) {
+            int m = vector1.Length;
+            int n = vector2.Length;
+            double[,] result = new double[m,n];
+
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    result[i,j] = vector1[i] * vector2[j];
                 }
             }
 
@@ -194,6 +237,40 @@ namespace RecurrentNeuralnetwork {
             return weights;
         }
     
+        public static double[,] Clip(double[,] matrix, double lowerBound, double upperBound) {
+            int m = matrix.GetLength(0);
+            int n = matrix.GetLength(1);
+
+            double[,] result = new double[m,n];
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (matrix[i,j] < lowerBound) {
+                        result[i,j] = lowerBound;
+                    } else if (matrix[i,j] > upperBound) {
+                        result[i,j] = upperBound;
+                    } else {
+                        result[i,j] = matrix[i,j];
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static double[] Clip(double[] vector, double lowerBound, double upperBound) {
+            int n = vector.Length;
+            double[] result = new double[n];
+            for (int i = 0; i < n; i++) {
+                if (vector[i] < lowerBound) {
+                    result[i] = lowerBound;
+                } else if (vector[i] > upperBound) {
+                    result[i] = upperBound;
+                } else {
+                    result[i] = vector[i];
+                }
+            }
+            return vector;
+        }
+
     }
 
 

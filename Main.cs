@@ -49,12 +49,23 @@ namespace RecurrentNeuralnetwork {
             double[] vector4 = {0.9, 0.1, 0};
             // Console.WriteLine(Loss.CrossEntropy(vector3, vector4));
 
-            char[] vector5 = {'a', 'c', 'b', 'd'};
-            double[] vector6 = {0, 0, 0};
+            int[] vector5 = {0, 4, 6, 2, 1};
+            double[] vector6 = {0, 0, 0, 0, 0, 0};
 
-            Network nn = new Network(4, 3, 5, 0.1);
-            var states = nn.ForwardPropogate(vector5, vector6);
+            Network nn = new Network(26, 6, 5, 0.1);
+            var states = nn.ForwardPropagate(vector5, vector6);
 
+            int target = 1;
+
+            var backStates = nn.BackPropagate(states.inputStates, states.hiddenStates, states.outputStates, target);
+
+            Matrix.Display(backStates.dU);
+            Console.WriteLine();
+            Matrix.Display(backStates.dV);
+            Console.WriteLine();
+            Matrix.Display(backStates.db);
+            Console.WriteLine();
+            
         }
     }
 }

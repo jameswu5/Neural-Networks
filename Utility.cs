@@ -69,26 +69,6 @@ namespace RecurrentNeuralnetwork {
             }
             return result;
         }
-
-        // matrix1 - matrix2
-        public static double[,] Subtract(double[,] matrix1, double[,] matrix2) {
-            if (matrix1.GetLength(0) != matrix2.GetLength(0) || matrix1.GetLength(1) != matrix2.GetLength(1)) {
-                throw new ArgumentException("Matrix sizes are not compatible");
-            }
-            
-            int m = matrix1.GetLength(0);
-            int n = matrix1.GetLength(1);
-
-            double[,] result = new double[m, n];
-
-            for (int i = 0; i < m; i++) {
-                for (int j = 0; j < n; j++) {
-                    result[i, j] = matrix1[i,j] - matrix2[i,j];
-                }
-            }
-
-            return result;
-        }
     
         // a * matrix
         public static double[,] ScalarMultiply(double[,] matrix, double scalar) {
@@ -153,6 +133,18 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
 
+        public static double[] MultiplyVectorElementwise(double[] vector1, double[] vector2) {
+            if (vector1.Length != vector2.Length) {
+                throw new ArgumentException("Vector sizes don't match");
+            }
+            int n = vector1.Length;
+            double[] result = new double[n];
+            for (int i = 0; i < n; i++) {
+                result[i] = vector1[i] * vector2[i];
+            }
+            return result;
+        }
+
         // vector1 column vector, vector2 row vector, multiply to get matrix
         public static double[,] MatrixMultiply(double[] vector1, double[] vector2) {
             int m = vector1.Length;
@@ -166,20 +158,6 @@ namespace RecurrentNeuralnetwork {
             }
 
             return result;
-        }
-
-        public static double DotProduct(double[] vector1, double[] vector2) {
-            if (vector1.Length != vector2.Length) {
-                throw new ArgumentException("Vector sizes are not the same");
-            }
-
-            double res = 0;
-
-            for (int i = 0; i < vector1.Length; i++) {
-                res += vector1[i] * vector2[i];
-            }
-
-            return res;
         }
 
         public static double[,] Transpose(double[,] matrix) {
@@ -267,9 +245,8 @@ namespace RecurrentNeuralnetwork {
                     result[i] = vector[i];
                 }
             }
-            return vector;
+            return result;
         }
-
     }
 
     public static class Activation {
@@ -318,6 +295,5 @@ namespace RecurrentNeuralnetwork {
 
             return result;
         }
-
     }
 }

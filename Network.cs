@@ -81,15 +81,15 @@ namespace RecurrentNeuralnetwork {
             double[] db = new double[hiddenSize];
             double[] dc = new double[outputSize];
 
-            Array.Copy(dy, dc, outputSize); // dc is now done
+            Array.Copy(dy, dc, outputSize);
             dV = Matrix.Add(dV, Matrix.MatrixMultiply(dy, hiddenStates[^1]));
 
             double[] dh = Matrix.MatrixMultiply(Matrix.Transpose(weightsV), dy);
 
             for (int t = sequenceLength - 1; t >= 0; t--) {
-                double[,] val = Matrix.Add(Matrix.MatrixMultiply(hiddenStates[t], hiddenStates[t]), -1);
+                double[] val = Matrix.Add(Matrix.MultiplyVectorElementwise(hiddenStates[t], hiddenStates[t]), -1);
                 val = Matrix.ScalarMultiply(val, -1);
-                double[] temp = Matrix.MatrixMultiply(val, dh);
+                double[] temp = Matrix.MultiplyVectorElementwise(val, dh);
 
                 db = Matrix.Add(db, temp);
                 double[] prevHiddenState = t == 0 ? previousHiddenState : hiddenStates[t - 1];
@@ -124,11 +124,41 @@ namespace RecurrentNeuralnetwork {
             return cost;
         }
     
-        public void Train(int[] input, int label) {
+        public bool PredictAndCheck(int[] input, int target) {
+            var states = ForwardPropagate(input);
+            double[] prediction = states.outputStates[^1];
+            double maxProb = 0;
+            int maxIndex = 0;
+            for (int i = 0; i < prediction.Length; i++) {
+                if (prediction[i] > maxProb) {
+                    maxProb = prediction[i];
+                    maxIndex = i;
+                }
+            }
+
+            return maxIndex == target;
+        }
+
+        public bool Check(double[] prediction, int target) {
+            double maxProb = 0;
+            int maxIndex = 0;
+            for (int i = 0; i < prediction.Length; i++) {
+                if (prediction[i] > maxProb) {
+                    maxProb = prediction[i];
+                    maxIndex = i;
+                }
+            }
+
+            return maxIndex == target;
+        }
+
+        public bool Train(int[] input, int label) {
             var f = ForwardPropagate(input);
-            Console.WriteLine(GetLoss(f.outputStates[^1], label));
+            // Console.WriteLine(GetLoss(f.outputStates[^1], label));
             var b = BackPropagate(f.inputStates, f.hiddenStates, f.outputStates, label);
             UpdateWeightsAndBiases(b.dU, b.dV, b.dW, b.db, b.dc);
+
+            return Check(f.outputStates[^1], label);
         }
     
         public void SaveNetwork(string filename) {

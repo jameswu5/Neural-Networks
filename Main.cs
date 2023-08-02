@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,65 +12,55 @@ namespace RecurrentNeuralnetwork {
         static Random rng = new Random();
 
         public static void Main() {
-            // TrainLanguages(1);
-            TestNetwork();
+            TrainLanguages(10);
         }
     
-        public static void Test() {
+        public static void TestUtility() {
+            // everything seems to work properly
+            double[][] matrix0 = new[] {
+                new double[] {1, 2, 3},
+                new double[] {4, 5, 6},
+                new double[] {7, 8, 9},
+                new double[] {9, 10, 11}
+            };
             double[,] matrix1 = {
-                {0, 4},
-                {1, 5},
-                {2, 6}
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 9},
+                {9, 10, 11}
             };
             double[,] matrix2 = {
-                {1, 2, 3, 4},
-                {5, 6, 7, 8}
+                {10, 11, 12},
+                {13, 14, 15},
+                {16, 17, 17},
+                {18, 19, 20}
             };
+            // Matrix.Display(matrix0[^1]);
+            // Matrix.Display(Matrix.Add(matrix1, matrix2));
+            
+            double[] vector1 = {1, 4, 7};
+            double[] vector2 = {0.5, 1, 1.5};
+            double[] vector3 = {0.9, 1, 1.1};
+            // Matrix.Display(Matrix.Add(vector1, vector2));
+            // Matrix.Display(Matrix.Add(vector1, vector2, vector3));
+            // Matrix.Display(Matrix.Add(matrix1, 5));
+            // Matrix.Display(Matrix.Add(vector1, 1.2));
+            // Matrix.Display(Matrix.ScalarMultiply(matrix1, 2));
+            // Matrix.Display(Matrix.ScalarMultiply(vector1, 1.5));
 
             double[,] matrix3 = {
-                {0, 1},
-                {2, 3},
-                {4, 5}
+                {10, 11, 12, 20, 21},
+                {13, 14, 15, 4, 1},
+                {16, 17, 17, 9, 2},
             };
 
-            // Matrix.Display(Matrix.MatrixMultiply(matrix1, matrix2));
+            // Matrix.Display(Matrix.MatrixMultiply(matrix1, matrix3));
+            // Matrix.Display(Matrix.MatrixMultiply(matrix1, vector2));
+            double[] vector4 = {-2, 1, 6, -1.5};
 
-            // Matrix.Display(Matrix.Subtract(matrix1, matrix3));
-            // Console.WriteLine();
-            // Matrix.Display(matrix1);
-
-
-            double[] vector1 = {3, 5, 6};
-            double[] vector2 = {1, 6.5, 2};
-            double[] vector = {2, 3};
-
-            // Matrix.Display(Matrix.MatrixMultiply(matrix3, vector));
-
-            // Matrix.Display(Matrix.Transpose(matrix1));
-
-            double[] soft = Activation.Softmax(vector1);
-            double[] tanh = Activation.Tanh(vector1);
-
-            // foreach (double s in tanh) {
-            //     Console.WriteLine(s);
-            // }
-
-
-            double[] vector3 = {0.15, 0.23, 0.62};
-            double[] vector4 = {0.9, 0.1, 0};
-            // Console.WriteLine(Loss.CrossEntropy(vector3, vector4));
-
-            int[] vector5 = {0, 4, 6, 2, 1};
-            double[] vector6 = {0, 0, 0, 0, 0, 0};
-
-            Matrix.Display(vector1);
-            Matrix.Display(vector2);
-
-            vector1 = Matrix.Add(vector1, vector2);
-            Matrix.Display(vector1);
-            Matrix.Display(vector2);
+            // Matrix.Display(Matrix.MatrixMultiply(vector1, vector4));
+            // Matrix.Display(Matrix.Transpose(matrix3));
         }
-    
 
         public static void TestNetwork() {
             RNN rnn = new RNN("networks/LanguageClassification.txt");
@@ -79,17 +70,33 @@ namespace RecurrentNeuralnetwork {
             Dictionary<char, int> vocabDictionary = GetVocabDictionary();
             List<(string , int)> data = GetLanguageData();
 
-            RNN rnn = new RNN(vocabDictionary.Count, 20, 10);
+            RNN rnn = new RNN(vocabDictionary.Count, 10, 6);
+            // RNN rnn = new RNN("networks/LanguageClassification.txt");
 
             for (int i = 0; i < epochs; i++) {
+                int correct = 0;
+                int total = 0;
                 Shuffle(data);
+
+                // for (int j = 0; j < 100; j++) {
+                //     (string word, int label) pair  = data[j];
+                //     int[] input = ConvertWordToInput(pair.word, vocabDictionary);
+                //     rnn.Train(input, pair.label);
+                // }
 
                 foreach ((string word, int label) pair in data) {
                     int[] input = ConvertWordToInput(pair.word, vocabDictionary);
-                    rnn.Train(input, pair.label);
+                    if (rnn.Train(input, pair.label)) {
+                        correct++;
+                    }
+                    total++;
                 }
+                Console.WriteLine($"Epoch {i+1}: {correct} / {total}");
             }
 
+
+
+            // Save the network
             rnn.SaveNetwork("networks/LanguageClassification.txt");
 
         }

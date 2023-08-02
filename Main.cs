@@ -10,7 +10,7 @@ namespace RecurrentNeuralnetwork {
         
         static Random rng = new Random();
 
-        public static void Main(string[] args) {
+        public static void Main() {
             // TrainLanguages(1);
             TestNetwork();
         }
@@ -72,16 +72,14 @@ namespace RecurrentNeuralnetwork {
     
 
         public static void TestNetwork() {
-
-            RNN rnn = new RNN(43, 20, 10, 0.01, "networks/LanguageClassification.txt");
-
+            RNN rnn = new RNN("networks/LanguageClassification.txt");
         }
 
         public static void TrainLanguages(int epochs) {
             Dictionary<char, int> vocabDictionary = GetVocabDictionary();
             List<(string , int)> data = GetLanguageData();
 
-            RNN rnn = new RNN(vocabDictionary.Count, 20, 10, 0.01);
+            RNN rnn = new RNN(vocabDictionary.Count, 20, 10);
 
             for (int i = 0; i < epochs; i++) {
                 Shuffle(data);

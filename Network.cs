@@ -8,43 +8,38 @@ namespace RecurrentNeuralnetwork {
         int hiddenSize;
         int outputSize;
 
-        double learnRate;
+        double learnRate = 0.01;
 
-        double[,] weightsU;
-        double[,] weightsV;
-        double[,] weightsW;
-        double[] biasB;
-        double[] biasC;
+        double[,] weightsU = null!;
+        double[,] weightsV = null!;
+        double[,] weightsW = null!;
+        double[] biasB = null!;
+        double[] biasC = null!;
 
         int sequenceLength;
         double[] previousHiddenState;
 
-        public RNN(int inputSize, int hiddenSize, int outputSize, double learnRate, string importFileName = "") {
+        // creating a new network
+        public RNN(int inputSize, int hiddenSize, int outputSize) {
             this.inputSize = inputSize;
             this.hiddenSize = hiddenSize;
             this.outputSize = outputSize;
 
-            this.learnRate = learnRate;
-
-            weightsU = new double[hiddenSize, inputSize];
-            weightsV = new double[outputSize, hiddenSize];
-            weightsW = new double[hiddenSize, hiddenSize];
+            weightsU = Matrix.InitialiseWeights(this.hiddenSize, this.inputSize);
+            weightsV = Matrix.InitialiseWeights(this.outputSize, this.hiddenSize);
+            weightsW = Matrix.InitialiseWeights(this.hiddenSize, this.hiddenSize);
 
             biasB = new double[hiddenSize];
             biasC = new double[outputSize];
 
-            if (importFileName == "") {
-                weightsU = Matrix.InitialiseWeights(this.hiddenSize, this.inputSize);
-                weightsV = Matrix.InitialiseWeights(this.outputSize, this.hiddenSize);
-                weightsW = Matrix.InitialiseWeights(this.hiddenSize, this.hiddenSize);
-            } else {
-                ImportNetwork(importFileName);
-            }
-
-            sequenceLength = 0;
             previousHiddenState = new double[hiddenSize];
         }
 
+        // importing a network
+        public RNN(string importFileName) {
+            ImportNetwork(importFileName);
+            previousHiddenState = new double[hiddenSize];
+        }
 
         public (double[][] inputStates, double[][] hiddenStates, double[][] outputStates) ForwardPropagate(int[] input) {
             sequenceLength = input.Length;
@@ -191,6 +186,14 @@ namespace RecurrentNeuralnetwork {
             inputSize = int.Parse(sizeData[0]);
             hiddenSize = int.Parse(sizeData[1]);
             outputSize = int.Parse(sizeData[2]);
+
+            weightsU = new double[hiddenSize, inputSize];
+            weightsV = new double[outputSize, hiddenSize];
+            weightsW = new double[hiddenSize, hiddenSize];
+
+            biasB = new double[hiddenSize];
+            biasC = new double[outputSize];
+
 
             int pointer = 1;
 

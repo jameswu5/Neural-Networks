@@ -272,7 +272,6 @@ namespace RecurrentNeuralnetwork {
 
     }
 
-
     public static class Activation {
 
         public static double[] Tanh(double[] vector) {

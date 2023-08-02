@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace RecurrentNeuralnetwork {
     public class RNN {
-        int vocabSize;
+        int inputSize;
         int hiddenSize;
         int outputSize;
 
@@ -19,23 +19,32 @@ namespace RecurrentNeuralnetwork {
         int sequenceLength;
         double[] previousHiddenState;
 
-        public RNN(int vocabSize, int hiddenSize, int outputSize, double learnRate) {
-            this.vocabSize = vocabSize;
+        public RNN(int inputSize, int hiddenSize, int outputSize, double learnRate, string importFileName = "") {
+            this.inputSize = inputSize;
             this.hiddenSize = hiddenSize;
             this.outputSize = outputSize;
 
             this.learnRate = learnRate;
 
-            weightsU = Matrix.InitialiseWeights(this.hiddenSize, this.vocabSize);
-            weightsV = Matrix.InitialiseWeights(this.outputSize, this.hiddenSize);
-            weightsW = Matrix.InitialiseWeights(this.hiddenSize, this.hiddenSize);
+            weightsU = new double[hiddenSize, inputSize];
+            weightsV = new double[outputSize, hiddenSize];
+            weightsW = new double[hiddenSize, hiddenSize];
 
             biasB = new double[hiddenSize];
             biasC = new double[outputSize];
 
+            if (importFileName == "") {
+                weightsU = Matrix.InitialiseWeights(this.hiddenSize, this.inputSize);
+                weightsV = Matrix.InitialiseWeights(this.outputSize, this.hiddenSize);
+                weightsW = Matrix.InitialiseWeights(this.hiddenSize, this.hiddenSize);
+            } else {
+                ImportNetwork(importFileName);
+            }
+
             sequenceLength = 0;
             previousHiddenState = new double[hiddenSize];
         }
+
 
         public (double[][] inputStates, double[][] hiddenStates, double[][] outputStates) ForwardPropagate(int[] input) {
             sequenceLength = input.Length;
@@ -46,7 +55,7 @@ namespace RecurrentNeuralnetwork {
 
             for (int time = 0; time < sequenceLength; time++) {
                 // create 1 hot vector
-                inputStates[time] = new double[vocabSize];
+                inputStates[time] = new double[inputSize];
                 inputStates[time][input[time]] = 1;
 
                 double[] Wh;
@@ -71,7 +80,7 @@ namespace RecurrentNeuralnetwork {
             Array.Copy(outputStates[^1], dy, outputSize);
             dy[target]--;
             
-            double[,] dU = new double[hiddenSize, vocabSize];
+            double[,] dU = new double[hiddenSize, inputSize];
             double[,] dV = new double[outputSize, hiddenSize];
             double[,] dW = new double[hiddenSize, hiddenSize];
             double[] db = new double[hiddenSize];
@@ -127,5 +136,103 @@ namespace RecurrentNeuralnetwork {
             UpdateWeightsAndBiases(b.dU, b.dV, b.dW, b.db, b.dc);
         }
     
+        public void SaveNetwork(string filename) {
+            using (StreamWriter writer = new StreamWriter(filename)) {
+                // write the sizes of input, hidden and output
+                writer.WriteLine($"{inputSize} {hiddenSize} {outputSize}");
+                
+                // write U
+                for (int i = 0; i < hiddenSize; i++) {
+                    for (int j = 0; j < inputSize; j++) {
+                        writer.Write(weightsU[i,j]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+
+                // write V
+                for (int i = 0; i < outputSize; i++) {
+                    for (int j = 0; j < hiddenSize; j++) {
+                        writer.Write(weightsV[i,j]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+
+                // write W
+                for (int i = 0; i < hiddenSize; i++) {
+                    for (int j = 0; j < hiddenSize; j++) {
+                        writer.Write(weightsW[i,j]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+
+                // Write b
+                for (int i = 0; i < hiddenSize; i++) {
+                    writer.Write(biasB[i]);
+                    writer.Write(" ");
+                }
+                writer.WriteLine();
+
+                // Write c
+                for (int i = 0; i < outputSize; i++) {
+                    writer.Write(biasC[i]);
+                    writer.Write(" ");
+                }
+            }
+        }
+
+        public void ImportNetwork(string filename) {
+            string[] networkData = File.ReadAllLines(filename);
+
+            // first line is size data
+            string[] sizeData = networkData[0].Split(' ');
+            inputSize = int.Parse(sizeData[0]);
+            hiddenSize = int.Parse(sizeData[1]);
+            outputSize = int.Parse(sizeData[2]);
+
+            int pointer = 1;
+
+            for (int i = 0; i < hiddenSize; i++) {
+                string[] row = networkData[pointer + i].Split(' ');
+                for (int j = 0; j < inputSize; j++) {
+                    weightsU[i,j] = double.Parse(row[j]);
+                }
+            }
+
+            pointer += hiddenSize;
+
+            for (int i = 0; i < outputSize; i++) {
+                string[] row = networkData[pointer + i].Split(' ');
+                for (int j = 0; j < hiddenSize; j++) {
+                    weightsV[i,j] = double.Parse(row[j]);
+                }
+            }
+
+            pointer += outputSize;
+
+            for (int i = 0; i < hiddenSize; i++) {
+                string[] row = networkData[pointer + i].Split(' ');
+                for (int j = 0; j < hiddenSize; j++) {
+                    weightsW[i,j] = double.Parse(row[j]);
+                }
+            }
+
+            pointer += hiddenSize;
+
+            string[] bAsString = networkData[pointer].Split(' ');
+            for (int i = 0; i < hiddenSize; i++) {
+                biasB[i] = double.Parse(bAsString[i]);
+            }
+
+
+            pointer++;
+
+            string[] cAsString = networkData[pointer].Split(' ');
+            for (int i = 0; i < outputSize; i++) {
+                biasC[i] = double.Parse(cAsString[i]);
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace RecurrentNeuralnetwork {
 
@@ -12,7 +11,8 @@ namespace RecurrentNeuralnetwork {
         static Random rng = new Random();
 
         public static void Main(string[] args) {
-            TrainLanguages(5);
+            // TrainLanguages(1);
+            TestNetwork();
         }
     
         public static void Test() {
@@ -62,21 +62,21 @@ namespace RecurrentNeuralnetwork {
             int[] vector5 = {0, 4, 6, 2, 1};
             double[] vector6 = {0, 0, 0, 0, 0, 0};
 
-            RNN nn = new RNN(26, 6, 5, 0.1);
-            var states = nn.ForwardPropagate(vector5);
+            Matrix.Display(vector1);
+            Matrix.Display(vector2);
 
-            int target = 1;
-
-            var backStates = nn.BackPropagate(states.inputStates, states.hiddenStates, states.outputStates, target);
-
-            Matrix.Display(backStates.dU);
-            Console.WriteLine();
-            Matrix.Display(backStates.dV);
-            Console.WriteLine();
-            Matrix.Display(backStates.db);
-            Console.WriteLine();
+            vector1 = Matrix.Add(vector1, vector2);
+            Matrix.Display(vector1);
+            Matrix.Display(vector2);
         }
     
+
+        public static void TestNetwork() {
+
+            RNN rnn = new RNN(43, 20, 10, 0.01, "networks/LanguageClassification.txt");
+
+        }
+
         public static void TrainLanguages(int epochs) {
             Dictionary<char, int> vocabDictionary = GetVocabDictionary();
             List<(string , int)> data = GetLanguageData();
@@ -91,6 +91,9 @@ namespace RecurrentNeuralnetwork {
                     rnn.Train(input, pair.label);
                 }
             }
+
+            rnn.SaveNetwork("networks/LanguageClassification.txt");
+
         }
 
         public static List<(string, int)> GetLanguageData() {

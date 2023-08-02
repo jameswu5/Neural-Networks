@@ -7,7 +7,6 @@ namespace RecurrentNeuralnetwork {
 
         public static double[,] Add(double[,] matrix1, double[,] matrix2) {
 
-
             if (matrix1.GetLength(0) != matrix2.GetLength(0) || matrix1.GetLength(1) != matrix2.GetLength(1)) {
                 throw new ArgumentException("Matrix sizes are not compatible");
             }
@@ -311,7 +310,7 @@ namespace RecurrentNeuralnetwork {
             if (vector.Length != target.Length) {
                 throw new ArgumentException("Vector sizes are not the same");
             }
-
+            
             double result = 0;
 
             for (int i = 0; i < vector.Length; i++) {

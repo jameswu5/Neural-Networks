@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace RecurrentNeuralnetwork {
-    public class Network {
+    public class RNN {
         int vocabSize;
         int hiddenSize;
         int outputSize;
@@ -19,7 +19,7 @@ namespace RecurrentNeuralnetwork {
         int sequenceLength;
         double[] previousHiddenState;
 
-        public Network(int vocabSize, int hiddenSize, int outputSize, double learnRate) {
+        public RNN(int vocabSize, int hiddenSize, int outputSize, double learnRate) {
             this.vocabSize = vocabSize;
             this.hiddenSize = hiddenSize;
             this.outputSize = outputSize;
@@ -37,7 +37,6 @@ namespace RecurrentNeuralnetwork {
             previousHiddenState = new double[hiddenSize];
         }
 
-        // This is for a char based recurrent neural network
         public (double[][] inputStates, double[][] hiddenStates, double[][] outputStates) ForwardPropagate(int[] input) {
             sequenceLength = input.Length;
 
@@ -46,6 +45,7 @@ namespace RecurrentNeuralnetwork {
             double[][] outputStates = new double[sequenceLength][];
 
             for (int time = 0; time < sequenceLength; time++) {
+                // create 1 hot vector
                 inputStates[time] = new double[vocabSize];
                 inputStates[time][input[time]] = 1;
 
@@ -65,7 +65,6 @@ namespace RecurrentNeuralnetwork {
 
             return (inputStates, hiddenStates, outputStates);
         }
-    
     
         public (double[,] dU, double[,] dV, double[,] dW, double[] db, double[] dc) BackPropagate(double[][] inputStates, double[][] hiddenStates, double[][] outputStates, int target) {
             double[] dy = new double[outputSize];
@@ -112,5 +111,21 @@ namespace RecurrentNeuralnetwork {
             biasB = Matrix.Add(biasB, Matrix.ScalarMultiply(db, -learnRate));
             biasC = Matrix.Add(biasC, Matrix.ScalarMultiply(dc, -learnRate));
         }
+    
+        public double GetLoss(double[] predictedOutput, int target) {
+            double[] expectedOutput = new double[outputSize];
+            expectedOutput[target] = 1;
+
+            double cost = Loss.CrossEntropy(predictedOutput, expectedOutput);
+            return cost;
+        }
+    
+        public void Train(int[] input, int label) {
+            var f = ForwardPropagate(input);
+            Console.WriteLine(GetLoss(f.outputStates[^1], label));
+            var b = BackPropagate(f.inputStates, f.hiddenStates, f.outputStates, label);
+            UpdateWeightsAndBiases(b.dU, b.dV, b.dW, b.db, b.dc);
+        }
+    
     }
 }

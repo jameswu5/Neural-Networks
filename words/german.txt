@@ -895,7 +895,6 @@ worden
 Millionen
 Wiedersehen
 Onkel
-#
 kennst
 sitzen
 dies
@@ -1033,4 +1032,3 @@ mögen
 Herren
 York
 Earl
-klingt

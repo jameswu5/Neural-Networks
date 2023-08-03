@@ -91,6 +91,10 @@ namespace RecurrentNeuralnetwork {
                 val = Matrix.ScalarMultiply(val, -1);
                 double[] temp = Matrix.MultiplyVectorElementwise(val, dh);
 
+                if (t == 0) {
+                    // Matrix.Display(temp);
+                }
+
                 db = Matrix.Add(db, temp);
                 double[] prevHiddenState = t == 0 ? previousHiddenState : hiddenStates[t - 1];
                 dW = Matrix.Add(dW, Matrix.MatrixMultiply(temp, prevHiddenState));
@@ -124,6 +128,24 @@ namespace RecurrentNeuralnetwork {
             return cost;
         }
     
+        public int Predict(int[] input) {
+            var states = ForwardPropagate(input);
+            double[] prediction = states.outputStates[^1];
+
+            Matrix.Display(prediction);
+            double maxProb = 0;
+            int maxIndex = 0;
+            for (int i = 0; i < prediction.Length; i++) {
+                if (prediction[i] > maxProb) {
+                    maxProb = prediction[i];
+                    maxIndex = i;
+                }
+            }
+
+            return maxIndex;
+
+        }
+
         public bool PredictAndCheck(int[] input, int target) {
             var states = ForwardPropagate(input);
             double[] prediction = states.outputStates[^1];
@@ -267,5 +289,19 @@ namespace RecurrentNeuralnetwork {
                 biasC[i] = double.Parse(cAsString[i]);
             }
         }
+    
+        public void DisplayWeightsAndBiases() {
+            Matrix.Display(weightsU);
+            Console.WriteLine();
+            Matrix.Display(weightsV);
+            Console.WriteLine();
+            Matrix.Display(weightsW);
+            Console.WriteLine();
+            Matrix.Display(biasB);
+            Console.WriteLine();
+            Matrix.Display(biasC);            
+        }
+
+    
     }
 }

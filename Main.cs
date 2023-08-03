@@ -12,6 +12,7 @@ namespace RecurrentNeuralnetwork {
         static Random rng = new Random();
 
         public static void Main() {
+            // TestNetwork();
             TrainLanguages(10);
         }
     
@@ -64,13 +65,23 @@ namespace RecurrentNeuralnetwork {
 
         public static void TestNetwork() {
             RNN rnn = new RNN("networks/LanguageClassification.txt");
+
+            string word = "0";
+            while (word != "q") {
+                Console.Write("Enter a word: ");
+                word = Console.ReadLine();
+                var dictionary = GetVocabDictionary();
+                int[] input = ConvertWordToInput(word, dictionary);
+                Console.WriteLine((Languages)rnn.Predict(input));
+            }
+
         }
 
         public static void TrainLanguages(int epochs) {
             Dictionary<char, int> vocabDictionary = GetVocabDictionary();
             List<(string , int)> data = GetLanguageData();
 
-            RNN rnn = new RNN(vocabDictionary.Count, 10, 6);
+            RNN rnn = new RNN(vocabDictionary.Count, 12, 6);
             // RNN rnn = new RNN("networks/LanguageClassification.txt");
 
             for (int i = 0; i < epochs; i++) {
@@ -93,8 +104,6 @@ namespace RecurrentNeuralnetwork {
                 }
                 Console.WriteLine($"Epoch {i+1}: {correct} / {total}");
             }
-
-
 
             // Save the network
             rnn.SaveNetwork("networks/LanguageClassification.txt");

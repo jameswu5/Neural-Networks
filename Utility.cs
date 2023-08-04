@@ -27,7 +27,7 @@ namespace RecurrentNeuralnetwork {
 
         public static double[] Add(double[] vector1, double[] vector2) {
             if (vector1.Length != vector2.Length) {
-                throw new ArgumentException("vector lengths don't match");
+                throw new ArgumentException($"vector lengths [{vector1.Length}, {vector2.Length}] don't match");
             }
 
             double[] result = new double[vector1.Length];

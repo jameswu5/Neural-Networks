@@ -44,16 +44,16 @@ namespace RecurrentNeuralnetwork {
             this.hiddenSize = hiddenSize;
             this.outputSize = outputSize;
 
-            weightsForget    = Matrix.InitialiseWeights(hiddenSize, inputSize);
+            weightsForget    = Matrix.InitialiseWeights(hiddenSize, inputSize + hiddenSize);
             biasesForget     = new double[hiddenSize];
 
-            weightsInput     = Matrix.InitialiseWeights(hiddenSize, inputSize);
+            weightsInput     = Matrix.InitialiseWeights(hiddenSize, inputSize + hiddenSize);
             biasesInput      = new double[hiddenSize];
 
-            weightsCandidate = Matrix.InitialiseWeights(hiddenSize, inputSize);
+            weightsCandidate = Matrix.InitialiseWeights(hiddenSize, inputSize + hiddenSize);
             biasesCandidate  = new double[hiddenSize];
 
-            weightsOutput    = Matrix.InitialiseWeights(hiddenSize, inputSize);
+            weightsOutput    = Matrix.InitialiseWeights(hiddenSize, inputSize + hiddenSize);
             biasesOutput     = new double[hiddenSize];
 
             weightsFinal     = Matrix.InitialiseWeights(outputSize, hiddenSize);
@@ -84,14 +84,15 @@ namespace RecurrentNeuralnetwork {
 
             for (int t = 0; t < sequenceLength; t++) {
                 // create 1 hot vector
-                double[] input = new double[inputSize - hiddenSize]; // inputSize - hiddenSize = vocabSize
+                double[] input = new double[inputSize];
                 input[inputs[t]] = 1;
-                inputStates[t] = input;
+                // inputStates[t] = input;
 
                 double[] prevHiddenState = t == 0 ? initialHiddenState : hiddenStates[t-1];
                 double[] prevCellState = t == 0 ? initialCellState : cellStates[t-1];
 
                 double[] concatenatedInputs = Matrix.Concatenate(prevHiddenState, input);
+                inputStates[t] = concatenatedInputs;
 
                 forgetGates[t]    = Activation.Sigmoid(Matrix.Add(Matrix.MatrixMultiply(weightsForget, concatenatedInputs), biasesForget));
                 inputGates[t]     = Activation.Sigmoid(Matrix.Add(Matrix.MatrixMultiply(weightsInput, concatenatedInputs), biasesInput));
@@ -110,16 +111,16 @@ namespace RecurrentNeuralnetwork {
         public void BackPropagate(int target, bool train = true) {
 
             // Gradients
-            double[,] d_weightsForget = new double[hiddenSize, inputSize];
+            double[,] d_weightsForget = new double[hiddenSize, inputSize + hiddenSize];
             double[] d_biasesForget = new double[hiddenSize];
-            double[,] d_weightsInput = new double[hiddenSize, inputSize];
+            double[,] d_weightsInput = new double[hiddenSize, inputSize + hiddenSize];
             double[] d_biasesInput = new double[hiddenSize];
-            double[,] d_weightsCandidate = new double[hiddenSize, inputSize];
+            double[,] d_weightsCandidate = new double[hiddenSize, inputSize + hiddenSize];
             double[] d_biasesCandidate = new double[hiddenSize];
-            double[,] d_weightsOutput = new double[hiddenSize, inputSize];
+            double[,] d_weightsOutput = new double[hiddenSize, inputSize + hiddenSize];
             double[] d_biasesOutput = new double[hiddenSize];
             double[,] d_weightsFinal = new double[outputSize, hiddenSize];
-            double[] d_biasesFinal = new double[hiddenSize];
+            double[] d_biasesFinal = new double[outputSize];
 
             // I think these are of hidden layer size
             double[] d_nextHidden = new double[hiddenSize];
@@ -135,7 +136,7 @@ namespace RecurrentNeuralnetwork {
 
                 // Final gate
                 d_weightsFinal = Matrix.Add(d_weightsFinal, Matrix.MatrixMultiply(error, hiddenStates[t]));
-                d_biasesFinal = Matrix.Add(d_biasesFinal, error); // problematic
+                d_biasesFinal = Matrix.Add(d_biasesFinal, error);
 
                 // Hidden state error
                 double[] d_hidden = Matrix.MatrixMultiply(Matrix.Transpose(d_weightsFinal), error);
@@ -145,7 +146,7 @@ namespace RecurrentNeuralnetwork {
                 double[] outputTemp = Matrix.MultiplyVectorElementwise(cellStates[t], d_hidden);
                 outputTemp = Matrix.MultiplyVectorElementwise(outputTemp, Derivative.Sigmoid(outputGates[t]));
                 outputTemp = Activation.Tanh(outputTemp);
-                d_weightsOutput = Matrix.Add(d_weightsOutput, Matrix.MatrixMultiply(outputTemp, inputStates[t])); // problematic
+                d_weightsOutput = Matrix.Add(d_weightsOutput, Matrix.MatrixMultiply(outputTemp, inputStates[t]));
                 d_biasesOutput = Matrix.Add(d_biasesOutput, outputTemp);
 
                 // Cell state error
@@ -157,23 +158,23 @@ namespace RecurrentNeuralnetwork {
                 // Forget gate
                 double[] forgetTemp = Matrix.MultiplyVectorElementwise(d_cell, prevCellState);
                 forgetTemp = Matrix.MultiplyVectorElementwise(forgetTemp, Derivative.Sigmoid(forgetGates[t]));
-                d_weightsForget = Matrix.Add(d_weightsForget, Matrix.MatrixMultiply(forgetTemp, inputStates[t])); // problematic
+                d_weightsForget = Matrix.Add(d_weightsForget, Matrix.MatrixMultiply(forgetTemp, inputStates[t]));
                 d_biasesForget = Matrix.Add(d_biasesForget, forgetTemp);
 
                 // Input gate
                 double[] inputTemp = Matrix.MultiplyVectorElementwise(d_cell, candidateGates[t]);
                 inputTemp = Matrix.MultiplyVectorElementwise(inputTemp, Derivative.Sigmoid(inputGates[t]));
-                d_weightsInput = Matrix.Add(d_weightsInput, Matrix.MatrixMultiply(inputTemp, inputStates[t])); // problematic
+                d_weightsInput = Matrix.Add(d_weightsInput, Matrix.MatrixMultiply(inputTemp, inputStates[t]));
                 d_biasesInput = Matrix.Add(d_biasesInput, inputTemp);
 
                 // Candidate gate
                 double[] candidateTemp = Matrix.MultiplyVectorElementwise(d_cell, inputGates[t]);
                 candidateTemp = Matrix.MultiplyVectorElementwise(candidateTemp, Derivative.Tanh(candidateGates[t]));
-                d_weightsCandidate = Matrix.Add(d_weightsCandidate, Matrix.MatrixMultiply(candidateTemp, inputStates[t])); // problematic
+                d_weightsCandidate = Matrix.Add(d_weightsCandidate, Matrix.MatrixMultiply(candidateTemp, inputStates[t]));
                 d_biasesCandidate = Matrix.Add(d_biasesCandidate, candidateTemp);
 
                 // Cancatenated inputs
-                double[] concatTemp = Matrix.MatrixMultiply(Matrix.Transpose(weightsFinal), forgetTemp); // problematic
+                double[] concatTemp = Matrix.MatrixMultiply(Matrix.Transpose(weightsForget), forgetTemp);
                 concatTemp = Matrix.Add(concatTemp, Matrix.MatrixMultiply(Matrix.Transpose(weightsInput), inputTemp));
                 concatTemp = Matrix.Add(concatTemp, Matrix.MatrixMultiply(Matrix.Transpose(weightsCandidate), candidateTemp));
                 concatTemp = Matrix.Add(concatTemp, Matrix.MatrixMultiply(Matrix.Transpose(weightsOutput), outputTemp));
@@ -196,22 +197,21 @@ namespace RecurrentNeuralnetwork {
             d_biasesOutput = Matrix.Clip(d_biasesOutput, -1, 1);
 
             if (train == true) {
-                weightsForget = Matrix.Add(weightsForget, Matrix.ScalarMultiply(d_weightsForget, learnRate));
-                biasesForget = Matrix.Add(biasesForget, Matrix.ScalarMultiply(d_biasesForget, learnRate));
+                weightsForget = Matrix.Add(weightsForget, Matrix.ScalarMultiply(d_weightsForget, -learnRate));
+                biasesForget = Matrix.Add(biasesForget, Matrix.ScalarMultiply(d_biasesForget, -learnRate));
 
-                weightsInput = Matrix.Add(weightsInput, Matrix.ScalarMultiply(d_weightsInput, learnRate));
-                biasesInput = Matrix.Add(biasesInput, Matrix.ScalarMultiply(d_biasesInput, learnRate));
+                weightsInput = Matrix.Add(weightsInput, Matrix.ScalarMultiply(d_weightsInput, -learnRate));
+                biasesInput = Matrix.Add(biasesInput, Matrix.ScalarMultiply(d_biasesInput, -learnRate));
 
-                weightsCandidate = Matrix.Add(weightsCandidate, Matrix.ScalarMultiply(d_weightsCandidate, learnRate));
-                biasesCandidate = Matrix.Add(biasesCandidate, Matrix.ScalarMultiply(d_biasesCandidate, learnRate));
+                weightsCandidate = Matrix.Add(weightsCandidate, Matrix.ScalarMultiply(d_weightsCandidate, -learnRate));
+                biasesCandidate = Matrix.Add(biasesCandidate, Matrix.ScalarMultiply(d_biasesCandidate, -learnRate));
 
-                weightsOutput = Matrix.Add(weightsOutput, Matrix.ScalarMultiply(d_weightsOutput, learnRate));
-                biasesOutput = Matrix.Add(biasesOutput, Matrix.ScalarMultiply(d_biasesOutput, learnRate));
+                weightsOutput = Matrix.Add(weightsOutput, Matrix.ScalarMultiply(d_weightsOutput, -learnRate));
+                biasesOutput = Matrix.Add(biasesOutput, Matrix.ScalarMultiply(d_biasesOutput, -learnRate));
 
-                weightsFinal = Matrix.Add(weightsFinal, Matrix.ScalarMultiply(d_weightsFinal, learnRate));
-                biasesFinal = Matrix.Add(biasesFinal, Matrix.ScalarMultiply(d_biasesFinal, learnRate));
+                weightsFinal = Matrix.Add(weightsFinal, Matrix.ScalarMultiply(d_weightsFinal, -learnRate));
+                biasesFinal = Matrix.Add(biasesFinal, Matrix.ScalarMultiply(d_biasesFinal, -learnRate));
             }
-
         }
     
     

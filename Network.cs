@@ -87,14 +87,7 @@ namespace RecurrentNeuralnetwork {
             double[] dh = Matrix.MatrixMultiply(Matrix.Transpose(weightsV), dy);
 
             for (int t = sequenceLength - 1; t >= 0; t--) {
-                double[] val = Matrix.Add(Matrix.MultiplyVectorElementwise(hiddenStates[t], hiddenStates[t]), -1);
-                val = Matrix.ScalarMultiply(val, -1);
-                double[] temp = Matrix.MultiplyVectorElementwise(val, dh);
-
-                if (t == 0) {
-                    // Matrix.Display(temp);
-                }
-
+                double[] temp = Matrix.MultiplyVectorElementwise(Derivative.Tanh(hiddenStates[t]), dh);
                 db = Matrix.Add(db, temp);
                 double[] prevHiddenState = t == 0 ? previousHiddenState : hiddenStates[t - 1];
                 dW = Matrix.Add(dW, Matrix.MatrixMultiply(temp, prevHiddenState));

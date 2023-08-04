@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,8 +11,7 @@ namespace RecurrentNeuralnetwork {
         static Random rng = new Random();
 
         public static void Main() {
-            // TestNetwork();
-            TrainLanguages(10);
+            TestUtility();
         }
     
         public static void TestUtility() {
@@ -61,6 +59,9 @@ namespace RecurrentNeuralnetwork {
 
             // Matrix.Display(Matrix.MatrixMultiply(vector1, vector4));
             // Matrix.Display(Matrix.Transpose(matrix3));
+
+            // Matrix.Display(Activation.Sigmoid(vector4));
+            Matrix.Display(Derivative.Sigmoid(vector4));
         }
 
         public static void TestNetwork() {
@@ -69,7 +70,7 @@ namespace RecurrentNeuralnetwork {
             string word = "0";
             while (word != "q") {
                 Console.Write("Enter a word: ");
-                word = Console.ReadLine();
+                word = Console.ReadLine().ToLower();
                 var dictionary = GetVocabDictionary();
                 int[] input = ConvertWordToInput(word, dictionary);
                 Console.WriteLine((Languages)rnn.Predict(input));
@@ -85,24 +86,35 @@ namespace RecurrentNeuralnetwork {
             // RNN rnn = new RNN("networks/LanguageClassification.txt");
 
             for (int i = 0; i < epochs; i++) {
-                int correct = 0;
-                int total = 0;
                 Shuffle(data);
 
-                // for (int j = 0; j < 100; j++) {
-                //     (string word, int label) pair  = data[j];
-                //     int[] input = ConvertWordToInput(pair.word, vocabDictionary);
-                //     rnn.Train(input, pair.label);
-                // }
+                int[] correct = new int[6];
+                int[] total = new int[6];
+
 
                 foreach ((string word, int label) pair in data) {
                     int[] input = ConvertWordToInput(pair.word, vocabDictionary);
                     if (rnn.Train(input, pair.label)) {
-                        correct++;
+                        correct[pair.label]++;
                     }
-                    total++;
+                    total[pair.label]++;
                 }
-                Console.WriteLine($"Epoch {i+1}: {correct} / {total}");
+
+                double[] successRate = new double[6];
+                for (int j = 0; j < 6; j++) {
+                    successRate[j] = Math.Round(correct[j] * 100.0 / total[j], 2);
+                }
+
+                Console.WriteLine($"Epoch {i+1}:");
+                Console.WriteLine($"Dutch: {successRate[0]}%");
+                Console.WriteLine($"English: {successRate[1]}%");
+                Console.WriteLine($"French: {successRate[2]}%");
+                Console.WriteLine($"German: {successRate[3]}%");
+                Console.WriteLine($"Italian: {successRate[4]}%");
+                Console.WriteLine($"Spanish: {successRate[5]}%");
+                Console.WriteLine($"Overall: {Math.Round(correct.Sum() * 100.0 / total.Sum(), 2)}%");
+                Console.WriteLine();
+
             }
 
             // Save the network

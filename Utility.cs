@@ -260,7 +260,15 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
 
-        // this avoids overflow
+        public static double[] Sigmoid(double[] vector) {
+            int n = vector.Length;
+            double[] result = new double[n];
+            for (int i = 0; i < n; i++) {
+                result[i] = 1 / (1 + Math.Exp(-vector[i]));
+            }
+            return result;
+        }
+
         public static double[] Softmax(double[] vector) {
             int n = vector.Length;
             double maxValue = vector.Max();
@@ -279,6 +287,19 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
     }
+
+    public static class Derivative {
+        public static double[] Tanh(double[] vector) {
+            double[] temp = Matrix.Add(Matrix.MultiplyVectorElementwise(vector, vector), -1);
+            return Matrix.ScalarMultiply(temp, -1);
+        }
+
+        public static double[] Sigmoid(double[] vector) {
+            double[] temp = Matrix.Add(vector, -1);
+            return Matrix.MultiplyVectorElementwise(vector, Matrix.ScalarMultiply(temp, -1));
+        }
+    }
+
 
     public static class Loss {
 

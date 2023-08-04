@@ -173,6 +173,20 @@ namespace RecurrentNeuralnetwork {
             return res;
         }
 
+        public static double[] Concatenate(double[] vector1, double[] vector2) {
+            int m = vector1.Length;
+            int n = vector2.Length;
+            double[] result = new double[m+n];
+            for (int i = 0; i < m; i++) {
+                result[i] = vector1[i];
+            }
+            for (int i = 0; i < n; i++) {
+                result[i + m] = vector2[i];
+            }
+
+            return result;
+        }
+
         public static void Display(double[,] matrix) {
             for (int i = 0; i < matrix.GetLength(0); i++) {
                 for (int j = 0; j < matrix.GetLength(1); j++) {

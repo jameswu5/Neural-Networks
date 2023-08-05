@@ -12,31 +12,31 @@ namespace RecurrentNeuralnetwork {
         double learnRate = 0.02;
 
         // Weights and biases
-        double[,] weightsForget;
-        double[]  biasesForget;
+        double[,] weightsForget = null!;
+        double[]  biasesForget = null!;
 
-        double[,] weightsInput;
-        double[]  biasesInput;
+        double[,] weightsInput = null!;
+        double[]  biasesInput = null!;
 
-        double[,] weightsCandidate;
-        double[]  biasesCandidate;
+        double[,] weightsCandidate = null!;
+        double[]  biasesCandidate = null!;
 
-        double[,] weightsOutput;
-        double[]  biasesOutput;
+        double[,] weightsOutput = null!;
+        double[]  biasesOutput = null!;
 
-        double[,] weightsFinal;
-        double[]  biasesFinal;
+        double[,] weightsFinal = null!;
+        double[]  biasesFinal = null!;
 
         int sequenceLength = 0;
 
-        double[][] inputStates;
-        double[][] hiddenStates;
-        double[][] cellStates;
-        double[][] candidateGates;
-        double[][] outputGates;
-        double[][] forgetGates;
-        double[][] inputGates;
-        double[][] outputs;
+        double[][] inputStates = null!;
+        double[][] hiddenStates = null!;
+        double[][] cellStates = null!;
+        double[][] candidateGates = null!;
+        double[][] outputGates = null!;
+        double[][] forgetGates = null!;
+        double[][] inputGates = null!;
+        double[][] outputs = null!;
 
 
         public LSTM(int inputSize, int hiddenSize, int outputSize) {
@@ -60,6 +60,11 @@ namespace RecurrentNeuralnetwork {
             biasesFinal      = new double[outputSize];
 
             // so that everything is initialsed as we exit the constructor
+            ResetStates(1);
+        }
+
+        public LSTM(string importFileName) {
+            ImportNetwork(importFileName);
             ResetStates(1);
         }
 
@@ -214,13 +219,184 @@ namespace RecurrentNeuralnetwork {
             }
         }
     
-    
         public void Train(int[] inputs, int label) {
             ForwardPropagate(inputs);
             BackPropagate(label);
         }
-    
-    
-    }
 
+        // Saving and importing neural networks
+
+        public void SaveNetwork(string filename) {
+            using (StreamWriter writer = new StreamWriter(filename)) {
+                // write the sizes of input, hidden and output
+                writer.WriteLine($"{inputSize} {hiddenSize} {outputSize}");
+                
+                for (int i = 0; i < hiddenSize; i++) {
+                    for (int j = 0; j < hiddenSize + inputSize; j++) {
+                        writer.Write(weightsForget[i,j]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+
+                for (int i = 0; i < hiddenSize; i++) {
+                    for (int j = 0; j < hiddenSize + inputSize; j++) {
+                        writer.Write(weightsInput[i,j]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+
+                for (int i = 0; i < hiddenSize; i++) {
+                    for (int j = 0; j < hiddenSize + inputSize; j++) {
+                        writer.Write(weightsCandidate[i,j]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+
+                for (int i = 0; i < hiddenSize; i++) {
+                    for (int j = 0; j < hiddenSize + inputSize; j++) {
+                        writer.Write(weightsOutput[i,j]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+
+                for (int i = 0; i < outputSize; i++) {
+                    for (int j = 0; j < hiddenSize; j++) {
+                        writer.Write(weightsFinal[i,j]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+
+                for (int i = 0; i < hiddenSize; i++) {
+                    writer.Write(biasesForget[i]);
+                    writer.Write(" ");
+                }
+                writer.WriteLine();
+
+                for (int i = 0; i < hiddenSize; i++) {
+                    writer.Write(biasesInput[i]);
+                    writer.Write(" ");
+                }
+                writer.WriteLine();
+
+                for (int i = 0; i < hiddenSize; i++) {
+                    writer.Write(biasesCandidate[i]);
+                    writer.Write(" ");
+                }
+                writer.WriteLine();
+
+                for (int i = 0; i < hiddenSize; i++) {
+                    writer.Write(biasesOutput[i]);
+                    writer.Write(" ");
+                }
+                writer.WriteLine();
+
+                for (int i = 0; i < outputSize; i++) {
+                    writer.Write(biasesFinal[i]);
+                    writer.Write(" ");
+                }
+            }
+        }
+       
+        public void ImportNetwork(string filename) {
+            string[] networkData = File.ReadAllLines(filename);
+
+            string[] sizeData = networkData[0].Split(' ');
+            inputSize = int.Parse(sizeData[0]);
+            hiddenSize = int.Parse(sizeData[1]);
+            outputSize = int.Parse(sizeData[2]);
+
+            weightsForget    = new double[hiddenSize, inputSize + hiddenSize];
+            biasesForget     = new double[hiddenSize];
+
+            weightsInput     = new double[hiddenSize, inputSize + hiddenSize];
+            biasesInput      = new double[hiddenSize];
+
+            weightsCandidate = new double[hiddenSize, inputSize + hiddenSize];
+            biasesCandidate  = new double[hiddenSize];
+
+            weightsOutput    = new double[hiddenSize, inputSize + hiddenSize];
+            biasesOutput     = new double[hiddenSize];
+
+            weightsFinal     = new double[outputSize, hiddenSize];
+            biasesFinal      = new double[outputSize];
+
+            int pointer = 1;
+
+            for (int i = 0; i < hiddenSize; i++) {
+                string[] row = networkData[pointer + i].Split(' ');
+                for (int j = 0; j < inputSize + hiddenSize; j++) {
+                    weightsForget[i,j] = double.Parse(row[j]);
+                }
+            }
+
+            pointer += hiddenSize;
+
+            for (int i = 0; i < hiddenSize; i++) {
+                string[] row = networkData[pointer + i].Split(' ');
+                for (int j = 0; j < inputSize + hiddenSize; j++) {
+                    weightsInput[i,j] = double.Parse(row[j]);
+                }
+            }
+
+            pointer += hiddenSize;
+
+            for (int i = 0; i < hiddenSize; i++) {
+                string[] row = networkData[pointer + i].Split(' ');
+                for (int j = 0; j < inputSize + hiddenSize; j++) {
+                    weightsCandidate[i,j] = double.Parse(row[j]);
+                }
+            }
+
+            pointer += hiddenSize;
+
+            for (int i = 0; i < hiddenSize; i++) {
+                string[] row = networkData[pointer + i].Split(' ');
+                for (int j = 0; j < inputSize + hiddenSize; j++) {
+                    weightsOutput[i,j] = double.Parse(row[j]);
+                }
+            }
+
+            pointer += hiddenSize;
+
+            for (int i = 0; i < outputSize; i++) {
+                string[] row = networkData[pointer + i].Split(' ');
+                for (int j = 0; j < hiddenSize; j++) {
+                    weightsFinal[i,j] = double.Parse(row[j]);
+                }
+            }
+
+            pointer += outputSize;
+
+            string[] forgetRow = networkData[pointer++].Split(' ');
+            for (int i = 0; i < hiddenSize; i++) {
+                biasesForget[i] = double.Parse(forgetRow[i]);
+            }
+
+            string[] inputRow = networkData[pointer++].Split(' ');
+            for (int i = 0; i < hiddenSize; i++) {
+                biasesInput[i] = double.Parse(inputRow[i]);
+            }
+
+            string[] candidateRow = networkData[pointer++].Split(' ');
+            for (int i = 0; i < hiddenSize; i++) {
+                biasesCandidate[i] = double.Parse(candidateRow[i]);
+            }
+
+            string[] outputRow = networkData[pointer++].Split(' ');
+            for (int i = 0; i < hiddenSize; i++) {
+                biasesOutput[i] = double.Parse(outputRow[i]);
+            }
+
+            string[] finalRow = networkData[pointer++].Split(' ');
+            for (int i = 0; i < outputSize; i++) {
+                biasesFinal[i] = double.Parse(finalRow[i]);
+            }
+        }
+       
+    }
 }

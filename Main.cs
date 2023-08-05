@@ -11,7 +11,7 @@ namespace RecurrentNeuralnetwork {
         static Random rng = new Random();
 
         public static void Main() {
-            TestUtility();
+            TestLSTM();
         }
     
         public static void TestUtility() {
@@ -61,7 +61,9 @@ namespace RecurrentNeuralnetwork {
             // Matrix.Display(Matrix.Transpose(matrix3));
 
             // Matrix.Display(Activation.Sigmoid(vector4));
-            Matrix.Display(Derivative.Sigmoid(vector4));
+            // Matrix.Display(Derivative.Sigmoid(vector4));
+
+            Matrix.Display(Matrix.Concatenate(vector1, vector4));
         }
 
         public static void TestNetwork() {
@@ -191,6 +193,19 @@ namespace RecurrentNeuralnetwork {
             }
             return res;
         }
+
+
+        public static void TestLSTM() {
+            // LSTM lstm = new LSTM(26, 10, 6);
+            LSTM lstm = new LSTM("networks/lstm.txt");
+            int[] inputs = {4, 6, 1, 9, 10};
+            lstm.Train(inputs, 4);
+            lstm.Train(inputs, 4);
+            lstm.SaveNetwork("networks/lstm.txt");
+
+        }
+
+
 
         // Fisher-Yates shuffle
         public static void Shuffle<T>(IList<T> list)  

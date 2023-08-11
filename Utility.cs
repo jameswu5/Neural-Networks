@@ -356,6 +356,21 @@ namespace NeuralNetworks {
 
             return result;
         }
+
+        public static double MeanSquaredError(double[] vector, double[] target) {
+            if (vector.Length != target.Length) {
+                throw new ArgumentException("Vector sizes are not the same");
+            }
+
+            double result = 0;
+
+            for (int i = 0; i < vector.Length; i++) {
+                result += (vector[i] - target[i]) * (vector[i] - target[i]);
+            }
+
+            return result / vector.Length;
+            
+        }
     }
 
     public static class Utility {

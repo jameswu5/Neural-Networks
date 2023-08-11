@@ -5,8 +5,8 @@ using System.Linq;
 namespace NeuralNetworks.Feedforward {
     public class Feedforward {
 
-        int[] layerSizes;
-        int numberOfLayers;
+        public int[] layerSizes;
+        public int numberOfLayers;
 
         double[][,] weights;
         double[][] biases;
@@ -31,9 +31,9 @@ namespace NeuralNetworks.Feedforward {
 
         public double[] ForwardPropagate(double[] vector) {
             layers = new double[numberOfLayers][];
+            vector = Activation.Sigmoid(vector);
             layers[0] = vector;
 
-            // assumes inputVector is already normalised
             for (int i = 0; i < numberOfLayers - 1; i++) {
                 vector = Matrix.Add(Matrix.MatrixMultiply(vector, weights[i]), biases[i]);
                 vector = Activation.Sigmoid(vector);
@@ -115,6 +115,17 @@ namespace NeuralNetworks.Feedforward {
                 weights[i] = Matrix.Add(weights[i], Matrix.ScalarMultiply(weightDerivatives[i], -learnRate));
                 biases[i] = Matrix.Add(biases[i], Matrix.ScalarMultiply(biasDerivatives[i], -learnRate));;
             }
+        }
+
+
+        public double[] GetOneHotVector(int label) {
+            double[] res = new double[layerSizes[^1]];
+            res[label] = 1;
+            return res;
+        }
+
+        public static int CheckIfCorrect(double[] outputVector, double[] expectedVector) {
+            return Array.IndexOf(outputVector, outputVector.Max()) == Array.IndexOf(expectedVector, expectedVector.Max()) ? 1 : 0;
         }
     }
 }

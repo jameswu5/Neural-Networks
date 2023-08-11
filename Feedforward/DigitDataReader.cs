@@ -11,23 +11,17 @@ namespace NeuralNetworks.Feedforward {
         public const string TestImages = "Feedforward/Digit-Data/test-images.idx3-ubyte";
         public const string TestLabels = "Feedforward/Digit-Data/test-labels.idx1-ubyte";
 
-        public static IEnumerable<Image> ReadTrainingData()
+        public static List<Image> ReadTrainingData()
         {
-            foreach (var item in Read(TrainImages, TrainLabels))
-            {
-                yield return item;
-            }
+            return Read(TrainImages, TrainLabels);
         }
 
-        public static IEnumerable<Image> ReadTestData()
+        public static List<Image> ReadTestData()
         {
-            foreach (var item in Read(TestImages, TestLabels))
-            {
-                yield return item;
-            }
+            return Read(TestImages, TestLabels);
         }
 
-        private static IEnumerable<Image> Read(string imagesPath, string labelsPath)
+        private static List<Image> Read(string imagesPath, string labelsPath)
         {
             BinaryReader labels = new BinaryReader(new FileStream(labelsPath, FileMode.Open));
             BinaryReader images = new BinaryReader(new FileStream(imagesPath, FileMode.Open));
@@ -40,61 +34,28 @@ namespace NeuralNetworks.Feedforward {
             int magicLabel = labels.ReadBigInt32();
             int numberOfLabels = labels.ReadBigInt32();
 
+            List<Image> imageList = new List<Image>();
+
+
             for (int i = 0; i < numberOfImages; i++)
             {
-                var bytes = images.ReadBytes(width * height);
-                var arr = new byte[height, width];
+                byte[] bytes = images.ReadBytes(width * height);
+                byte[,] arr = new byte[height, width];
 
                 arr.ForEach((j,k) => arr[j, k] = bytes[j * height + k]);
 
-                yield return new Image()
-                {
-                    Data = arr,
-                    Label = labels.ReadByte()
-                };
+                imageList.Add(new Image(labels.ReadByte(), arr, bytes));
             }
+
+            return imageList;
         }
 
-    }
-
-    public class Image
-    {
-        public byte Label { get; set; }
-        public byte[,] Data { get; set; }
-
-        public void Display() {
-            for (int i = 0; i < Data.GetLength(0); i++) {
-                for (int j = 0; j < Data.GetLength(1); j++) {
-                    string d = Data[i, j].ToString();
-                    switch (d.Length) {
-                        case 1:
-                            Console.Write("  ");
-                            Console.Write(d);
-                            Console.Write("  ");
-                            break;
-                        case 2:
-                            Console.Write(" ");
-                            Console.Write(d);
-                            Console.Write("  ");
-                            break;
-                        case 3:
-                            Console.Write(" ");
-                            Console.Write(d);
-                            Console.Write(" ");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                Console.WriteLine();
-            }
-        }
     }
 
     public static class Extensions {
         public static int ReadBigInt32(this BinaryReader br)
         {
-            var bytes = br.ReadBytes(sizeof(Int32));
+            var bytes = br.ReadBytes(sizeof(int));
             if (BitConverter.IsLittleEndian) Array.Reverse(bytes);
             return BitConverter.ToInt32(bytes, 0);
         }

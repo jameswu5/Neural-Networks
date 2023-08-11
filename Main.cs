@@ -9,7 +9,10 @@ namespace NeuralNetworks {
         public static void Main() {
             // Recurrent.Program.TrainLanguages(10);
             // TestUtility();
-            Feedforward.Program.TestForwardPropagation();
+            // Feedforward.Program.TestForwardPropagation();
+            // Feedforward.Program.TestImages();
+
+            Feedforward.Program.TrainDefault();
         }
     
         public static void TestUtility() {
@@ -67,7 +70,9 @@ namespace NeuralNetworks {
                 {1, 4}, {2, 5}, {3, 6}
             };
             double[] vector5 = {1, 2, 3};
-            Matrix.Display(Matrix.MatrixMultiply(vector5, matrix4));
+            // Matrix.Display(Matrix.MatrixMultiply(vector5, matrix4));
+
+            Console.WriteLine(Loss.MeanSquaredError(vector1, vector2));
         }
 
     }

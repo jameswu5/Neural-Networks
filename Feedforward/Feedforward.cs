@@ -108,5 +108,13 @@ namespace NeuralNetworks.Feedforward {
 
             return (weightDerivatives, biasDerivatives);
         }
+
+        public void UpdateWeightsAndBiases(double[][,] weightDerivatives, double[][] biasDerivatives) {
+
+            for (int i = 0; i < numberOfLayers - 1; i++) {
+                weights[i] = Matrix.Add(weights[i], Matrix.ScalarMultiply(weightDerivatives[i], -learnRate));
+                biases[i] = Matrix.Add(biases[i], Matrix.ScalarMultiply(biasDerivatives[i], -learnRate));;
+            }
+        }
     }
 }

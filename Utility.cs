@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RecurrentNeuralnetwork {
+namespace NeuralNetworks {
     public static class Matrix {
 
         public static double[,] Add(double[,] matrix1, double[,] matrix2) {
@@ -314,9 +314,7 @@ namespace RecurrentNeuralnetwork {
         }
     }
 
-
     public static class Loss {
-
         public static double CrossEntropy(double[] vector, double[] target) {
             if (vector.Length != target.Length) {
                 throw new ArgumentException("Vector sizes are not the same");
@@ -331,4 +329,19 @@ namespace RecurrentNeuralnetwork {
             return result;
         }
     }
+
+    public static class Utility {
+        // Fisher-Yates shuffle
+        public static void Shuffle<T>(IList<T> list)  
+        {  
+            Random rng = new Random();
+            int n = list.Count;  
+            while (n > 1) {  
+                n--;
+                int k = rng.Next(n + 1);
+                (list[n], list[k]) = (list[k], list[n]);
+            }
+        }
+    }
+
 }

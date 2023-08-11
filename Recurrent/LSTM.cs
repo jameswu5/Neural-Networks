@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RecurrentNeuralnetwork {
+namespace NeuralNetworks.Recurrent {
 
     public class LSTM {
         int inputSize;
@@ -110,6 +110,8 @@ namespace RecurrentNeuralnetwork {
                 outputs[t] = Matrix.Add(Matrix.MatrixMultiply(weightsFinal, hiddenStates[t]), biasesFinal);
             }
 
+            // Matrix.Display(Activation.Softmax(outputs[^1]));
+
             return Activation.Softmax(outputs[^1]);
         }
 
@@ -131,13 +133,13 @@ namespace RecurrentNeuralnetwork {
             double[] d_nextHidden = new double[hiddenSize];
             double[] d_nextCell = new double[hiddenSize];
 
+
             for (int t = sequenceLength - 1; t >= 0; t--) {
 
                 double[] prevCellState = t == 0 ? new double[hiddenSize] : cellStates[t - 1];
 
                 double[] error = Activation.Softmax(outputs[t]);
                 error[target] -= 1;
-                // multiply by -1 ?
 
                 // Final gate
                 d_weightsFinal = Matrix.Add(d_weightsFinal, Matrix.MatrixMultiply(error, hiddenStates[t]));
@@ -190,16 +192,17 @@ namespace RecurrentNeuralnetwork {
             }
 
             // clip the gradients to prevent exploding gradients
-            d_weightsCandidate = Matrix.Clip(d_weightsCandidate, -1, 1);
-            d_weightsFinal = Matrix.Clip(d_weightsFinal, -1, 1);
-            d_weightsForget = Matrix.Clip(d_weightsForget, -1, 1);
-            d_weightsInput = Matrix.Clip(d_weightsInput, -1, 1);
-            d_weightsOutput = Matrix.Clip(d_weightsOutput, -1, 1);
-            d_biasesCandidate = Matrix.Clip(d_biasesCandidate, -1, 1);
-            d_biasesFinal = Matrix.Clip(d_biasesFinal, -1, 1);
-            d_biasesForget = Matrix.Clip(d_biasesForget, -1, 1);
-            d_biasesInput = Matrix.Clip(d_biasesInput, -1, 1);
-            d_biasesOutput = Matrix.Clip(d_biasesOutput, -1, 1);
+            d_weightsForget = Matrix.Clip(d_weightsForget, -2, 2);
+            d_weightsInput = Matrix.Clip(d_weightsInput, -2, 2);
+            d_weightsCandidate = Matrix.Clip(d_weightsCandidate, -2, 2);
+            d_weightsOutput = Matrix.Clip(d_weightsOutput, -2, 2);
+            d_weightsFinal = Matrix.Clip(d_weightsFinal, -2, 2);
+            d_biasesForget = Matrix.Clip(d_biasesForget, -2, 2);
+            d_biasesInput = Matrix.Clip(d_biasesInput, -2, 2);
+            d_biasesCandidate = Matrix.Clip(d_biasesCandidate, -2, 2);
+            d_biasesOutput = Matrix.Clip(d_biasesOutput, -2, 2);
+            d_biasesFinal = Matrix.Clip(d_biasesFinal, -2, 2);
+
 
             if (train == true) {
                 weightsForget = Matrix.Add(weightsForget, Matrix.ScalarMultiply(d_weightsForget, -learnRate));
@@ -219,12 +222,32 @@ namespace RecurrentNeuralnetwork {
             }
         }
     
-        public void Train(int[] inputs, int label) {
-            ForwardPropagate(inputs);
-            BackPropagate(label);
+        public bool Check(double[] probs, int target) {
+            double maxProb = 0;
+            int maxIndex = 0;
+            for (int i = 0; i < probs.Length; i++) {
+                if (probs[i] > maxProb) {
+                    maxProb = probs[i];
+                    maxIndex = i;
+                }
+            }
+
+            return maxIndex == target;
         }
 
-        // Saving and importing neural networks
+        public double GetLoss(double[] probs, int target) {
+            double[] expectedOutput = new double[outputSize];
+            expectedOutput[target] = 1;
+
+            double cost = Loss.CrossEntropy(probs, expectedOutput);
+            return cost;
+        }
+
+        public bool Train(int[] inputs, int label) {
+            double[] probs = ForwardPropagate(inputs);
+            BackPropagate(label);
+            return Check(probs, label);
+        }
 
         public void SaveNetwork(string filename) {
             using (StreamWriter writer = new StreamWriter(filename)) {

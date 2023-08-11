@@ -1,6 +1,6 @@
-*
-!*.gitignore
-!*.cs
-!/words
-!/networks
-!*.txt
+*obj
+*.py
+*.vscode
+*bin
+*.csproj
+*.sln

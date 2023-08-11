@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RecurrentNeuralnetwork {
-    public class RNN {
+namespace NeuralNetworks.Recurrent {
+    public class Vanilla {
         int inputSize;
         int hiddenSize;
         int outputSize;
@@ -20,7 +20,7 @@ namespace RecurrentNeuralnetwork {
         double[] previousHiddenState;
 
         // creating a new network
-        public RNN(int inputSize, int hiddenSize, int outputSize) {
+        public Vanilla(int inputSize, int hiddenSize, int outputSize) {
             this.inputSize = inputSize;
             this.hiddenSize = hiddenSize;
             this.outputSize = outputSize;
@@ -36,7 +36,7 @@ namespace RecurrentNeuralnetwork {
         }
 
         // importing a network
-        public RNN(string importFileName) {
+        public Vanilla(string importFileName) {
             ImportNetwork(importFileName);
             previousHiddenState = new double[hiddenSize];
         }

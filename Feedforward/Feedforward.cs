@@ -29,6 +29,41 @@ namespace NeuralNetworks.Feedforward {
             }
         }
 
+        public Feedforward(string path) {
+            string[] networkData = File.ReadAllLines(path);
+            string[] sizeData = networkData[0].TrimEnd(' ').Split(' ');
+            layerSizes = Array.ConvertAll(sizeData, int.Parse);
+            numberOfLayers = layerSizes.Length;
+
+            weights = new double[numberOfLayers - 1][,];
+            biases = new double[numberOfLayers - 1][];
+            layers = new double[numberOfLayers][];
+
+            int pointer = 1;
+
+            for (int i = 0; i < numberOfLayers - 1; i++) {
+                double[,] weightMatrix = new double[layerSizes[i], layerSizes[i+1]];
+
+                for (int j = 0; j < layerSizes[i]; j++) {
+                    string[] row = networkData[pointer + j].Split(' ');
+                    for (int k = 0; k < layerSizes[i+1]; k++) {
+                        weightMatrix[j, k] = double.Parse(row[k]);
+                    }
+                }
+                weights[i] = weightMatrix;
+                pointer += layerSizes[i];
+            }
+
+            for (int i = 0; i < numberOfLayers - 1; i++, pointer++) {
+                double[] biasVector = new double[layerSizes[i+1]];
+                string[] row = networkData[pointer].Split(' ');
+                for (int j = 0; j < layerSizes[i+1]; j++) {
+                    biasVector[j] = double.Parse(row[j]);
+                }
+                biases[i] = biasVector;
+            }
+        }
+
         public double[] ForwardPropagate(double[] vector) {
             layers = new double[numberOfLayers][];
             vector = Activation.Sigmoid(vector);
@@ -117,7 +152,6 @@ namespace NeuralNetworks.Feedforward {
             }
         }
 
-
         public double[] GetOneHotVector(int label) {
             double[] res = new double[layerSizes[^1]];
             res[label] = 1;
@@ -126,6 +160,33 @@ namespace NeuralNetworks.Feedforward {
 
         public static int CheckIfCorrect(double[] outputVector, double[] expectedVector) {
             return Array.IndexOf(outputVector, outputVector.Max()) == Array.IndexOf(expectedVector, expectedVector.Max()) ? 1 : 0;
+        }
+
+        public void SaveNetwork(string path) {
+            using (StreamWriter writer = new StreamWriter(path)) {
+                foreach (int l in layerSizes) {
+                    writer.Write($"{l} ");
+                }
+                writer.WriteLine();
+
+                foreach (double[,] weightMatrix in weights) {
+                    for (int i = 0; i < weightMatrix.GetLength(0); i++) {
+                        for (int j = 0; j < weightMatrix.GetLength(1); j++) {
+                            writer.Write(weightMatrix[i,j]);
+                            writer.Write(" ");
+                        }
+                        writer.WriteLine();
+                    }
+                }
+
+                foreach (double[] biasVector in biases) {
+                    for (int i = 0; i < biasVector.Length; i++) {
+                        writer.Write(biasVector[i]);
+                        writer.Write(" ");
+                    }
+                    writer.WriteLine();
+                }
+            }
         }
     }
 }

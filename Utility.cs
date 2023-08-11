@@ -330,6 +330,16 @@ namespace NeuralNetworks {
             double[] temp = Matrix.Add(vector, -1);
             return Matrix.MultiplyVectorElementwise(vector, Matrix.ScalarMultiply(temp, -1));
         }
+
+        public static double Sigmoid(double value) {
+            // assumes value has sigmoid already applied to it
+            return value * (1 - value);
+        }
+
+
+        public static double MeanSquaredError(double observed, double expected) {
+            return 2 * (observed - expected);
+        }
     }
 
     public static class Loss {
@@ -358,6 +368,17 @@ namespace NeuralNetworks {
                 n--;
                 int k = rng.Next(n + 1);
                 (list[n], list[k]) = (list[k], list[n]);
+            }
+        }
+
+        public static void Reverse<T>(IList<T> list)
+        {
+            int start = 0;
+            int end = list.Count - 1;
+            while (start < end) {
+                (list[start], list[end]) = (list[end], list[start]);
+                start++;
+                end--;
             }
         }
     }

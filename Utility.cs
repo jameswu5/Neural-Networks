@@ -133,6 +133,24 @@ namespace NeuralNetworks {
             return result;
         }
 
+        public static double[] MatrixMultiply(double[] vector, double[,] matrix) {
+            int n = vector.Length;
+            if (n != matrix.GetLength(0)) {
+                throw new ArgumentException($"Vector [{n}] and matrix [{matrix.GetLength(0)}] size not compatible");
+            }
+
+            double[] result = new double[matrix.GetLength(1)];
+            for (int j = 0; j < matrix.GetLength(1); j++) {
+                double val = 0;
+                for (int i = 0; i < vector.Length; i++) {
+                    val += vector[i] * matrix[i, j];
+                }
+                result[j] = val;
+            }
+
+            return result;
+        }
+
         public static double[] MultiplyVectorElementwise(double[] vector1, double[] vector2) {
             if (vector1.Length != vector2.Length) {
                 throw new ArgumentException("Vector sizes don't match");

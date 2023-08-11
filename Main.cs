@@ -7,7 +7,9 @@ namespace NeuralNetworks {
     public class Program {
 
         public static void Main() {
-            Recurrent.Program.TrainLanguages(10);
+            // Recurrent.Program.TrainLanguages(10);
+            // TestUtility();
+            Feedforward.Program.TestForwardPropagation();
         }
     
         public static void TestUtility() {
@@ -59,7 +61,13 @@ namespace NeuralNetworks {
             // Matrix.Display(Activation.Sigmoid(vector4));
             // Matrix.Display(Derivative.Sigmoid(vector4));
 
-            Matrix.Display(Matrix.Concatenate(vector1, vector4));
+            // Matrix.Display(Matrix.Concatenate(vector1, vector4));
+
+            double[,] matrix4 = {
+                {1, 4}, {2, 5}, {3, 6}
+            };
+            double[] vector5 = {1, 2, 3};
+            Matrix.Display(Matrix.MatrixMultiply(vector5, matrix4));
         }
 
     }

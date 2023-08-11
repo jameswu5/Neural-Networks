@@ -81,5 +81,32 @@ namespace NeuralNetworks.Feedforward {
 
             return nodeValues;
         }
+
+        public (double[][,] weightDerivatives, double[][] biasDerivatives) BackPropagate(double[] expectedOutput) {
+
+            double[][] nodeValues = GetNodeValues(expectedOutput);
+
+            double[][,] weightDerivatives = new double[numberOfLayers - 1][,];
+            double[][] biasDerivatives = new double[numberOfLayers - 1][];
+
+            for (int index = 0; index < numberOfLayers - 1; index++) {
+                double[,] weightDerivative = new double[layerSizes[index], layerSizes[index + 1]];
+
+                for (int inNodeIndex = 0; inNodeIndex < layerSizes[index]; inNodeIndex++) {
+                    for (int outNodeIndex = 0; outNodeIndex < layerSizes[index + 1]; outNodeIndex++) {
+                        weightDerivative[inNodeIndex,outNodeIndex] = layers[index][inNodeIndex] * nodeValues[index][outNodeIndex];
+                    }
+                }
+                weightDerivatives[index] = weightDerivative;
+
+                double[] biasDerivative = new double[layerSizes[index + 1]];
+                for (int nodeIndex = 0; nodeIndex < layerSizes[index + 1]; nodeIndex++) {
+                    biasDerivative[nodeIndex] = 1 * nodeValues[index][nodeIndex];
+                }
+                biasDerivatives[index] = biasDerivative;
+            }
+
+            return (weightDerivatives, biasDerivatives);
+        }
     }
 }

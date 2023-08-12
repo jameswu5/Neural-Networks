@@ -12,7 +12,9 @@ namespace NeuralNetworks {
             // Feedforward.Program.TestForwardPropagation();
             // Feedforward.Program.TestImages();
 
-            Feedforward.Program.TrainDefault();
+            // Feedforward.DigitRecognition.TrainDefault();
+            // Feedforward.DigitRecognition.TestOneImage();
+            Feedforward.DigitRecognition.TestDefault();
         }
     
         public static void TestUtility() {

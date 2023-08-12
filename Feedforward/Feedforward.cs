@@ -9,7 +9,7 @@ namespace NeuralNetworks.Feedforward {
         public int numberOfLayers;
 
         double[][,] weights;
-        double[][] biases;
+        public double[][] biases;
         double[][] layers;
 
         double learnRate = 1;
@@ -148,7 +148,7 @@ namespace NeuralNetworks.Feedforward {
 
             for (int i = 0; i < numberOfLayers - 1; i++) {
                 weights[i] = Matrix.Add(weights[i], Matrix.ScalarMultiply(weightDerivatives[i], -learnRate));
-                biases[i] = Matrix.Add(biases[i], Matrix.ScalarMultiply(biasDerivatives[i], -learnRate));;
+                biases[i] = Matrix.Add(biases[i], Matrix.ScalarMultiply(biasDerivatives[i], -learnRate));
             }
         }
 

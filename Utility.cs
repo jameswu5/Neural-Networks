@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace NeuralNetworks {
@@ -205,29 +206,29 @@ namespace NeuralNetworks {
             return result;
         }
 
-        public static void Display(double[,] matrix) {
+        public static void Display(double[,] matrix, int digits = 3) {
             for (int i = 0; i < matrix.GetLength(0); i++) {
                 for (int j = 0; j < matrix.GetLength(1); j++) {
-                    Console.Write(matrix[i,j]);
+                    Console.Write(Math.Round(matrix[i,j], digits));
                     Console.Write(" ");
                 }
                 Console.WriteLine();
             }
         }
     
-        public static void Display(double[][] matrix) {
+        public static void Display(double[][] matrix, int digits = 3) {
             for (int i = 0; i < matrix.Length; i++) {
                 for (int j = 0; j < matrix[i].Length; j++) {
-                    Console.Write(matrix[i][j]);
+                    Console.Write(Math.Round(matrix[i][j], digits));
                     Console.Write(" ");
                 }
                 Console.WriteLine();
             }
         }
 
-        public static void Display(double[] vector) {
+        public static void Display(double[] vector, int digits = 3) {
             foreach (double v in vector) {
-                Console.Write($"{v} ");
+                Console.Write($"{Math.Round(v, digits)} ");
             }
             Console.WriteLine();
         }
@@ -292,11 +293,15 @@ namespace NeuralNetworks {
             return result;
         }
 
+        public static double Sigmoid(double value) {
+            return 1 / (1 + Math.Exp(-value));
+        }
+
         public static double[] Sigmoid(double[] vector) {
             int n = vector.Length;
             double[] result = new double[n];
             for (int i = 0; i < n; i++) {
-                result[i] = 1 / (1 + Math.Exp(-vector[i]));
+                result[i] = Sigmoid(vector[i]);
             }
             return result;
         }

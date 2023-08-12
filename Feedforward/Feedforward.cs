@@ -8,11 +8,11 @@ namespace NeuralNetworks.Feedforward {
         public int[] layerSizes;
         public int numberOfLayers;
 
-        double[][,] weights;
+        public double[][,] weights;
         public double[][] biases;
         double[][] layers;
 
-        double learnRate = 1;
+        double learnRate = 0.05;
 
         public Feedforward(int[] layerSizes) {
             this.layerSizes = layerSizes;
@@ -95,9 +95,8 @@ namespace NeuralNetworks.Feedforward {
         public static double[] GetHiddenLayerNodeValues(double[] hiddenLayer, double[] higherLayerNodeValues, double[,] weightMatrix) {
             double[] nodeValues = Matrix.MatrixMultiply(weightMatrix, higherLayerNodeValues);
             for (int i = 0; i < hiddenLayer.Length; i++) {
-                double layerNode = hiddenLayer[i];
-                double derivative = Derivative.Sigmoid(layerNode);
-                nodeValues[i] = nodeValues[i] * derivative;
+                double derivative = Derivative.Sigmoid(hiddenLayer[i]);
+                nodeValues[i] *= derivative;
             }
             return nodeValues;
         }
@@ -108,8 +107,7 @@ namespace NeuralNetworks.Feedforward {
 
             for (int i = 0; i < numberOfLayers - 2; i++) {
                 double[,] weightMatrix = weights[numberOfLayers - 2 - i];
-                double[] layerNodeValues = GetHiddenLayerNodeValues(layers[numberOfLayers - 2 - i], nodeValues[i], weightMatrix);
-                nodeValues[i + 1] = layerNodeValues;
+                nodeValues[i+1] = GetHiddenLayerNodeValues(layers[numberOfLayers - 2 - i], nodeValues[i], weightMatrix);
             }
 
             Utility.Reverse(nodeValues);
@@ -129,7 +127,7 @@ namespace NeuralNetworks.Feedforward {
 
                 for (int inNodeIndex = 0; inNodeIndex < layerSizes[index]; inNodeIndex++) {
                     for (int outNodeIndex = 0; outNodeIndex < layerSizes[index + 1]; outNodeIndex++) {
-                        weightDerivative[inNodeIndex,outNodeIndex] = layers[index][inNodeIndex] * nodeValues[index][outNodeIndex];
+                        weightDerivative[inNodeIndex, outNodeIndex] = layers[index][inNodeIndex] * nodeValues[index][outNodeIndex];
                     }
                 }
                 weightDerivatives[index] = weightDerivative;
@@ -145,7 +143,6 @@ namespace NeuralNetworks.Feedforward {
         }
 
         public void UpdateWeightsAndBiases(double[][,] weightDerivatives, double[][] biasDerivatives) {
-
             for (int i = 0; i < numberOfLayers - 1; i++) {
                 weights[i] = Matrix.Add(weights[i], Matrix.ScalarMultiply(weightDerivatives[i], -learnRate));
                 biases[i] = Matrix.Add(biases[i], Matrix.ScalarMultiply(biasDerivatives[i], -learnRate));

@@ -15,6 +15,8 @@ namespace NeuralNetworks {
             // Feedforward.DigitRecognition.TrainDefault();
             // Feedforward.DigitRecognition.TestOneImage();
             Feedforward.DigitRecognition.TestDefault();
+            // Feedforward.DigitRecognition.TrainOneBatch();
+            // Feedforward.DigitRecognition.TrainIndividual(5);
         }
     
         public static void TestUtility() {
@@ -74,7 +76,14 @@ namespace NeuralNetworks {
             double[] vector5 = {1, 2, 3};
             // Matrix.Display(Matrix.MatrixMultiply(vector5, matrix4));
 
-            Console.WriteLine(Loss.MeanSquaredError(vector1, vector2));
+            // Console.WriteLine(Loss.MeanSquaredError(vector1, vector2));
+
+
+            List<double> vector6 = new List<double>() {1,2,3,4,5,6,7,8,9,10};
+
+            foreach (double d in vector6.GetRange(3,4)) {
+                Console.WriteLine(d);
+            }
         }
 
     }

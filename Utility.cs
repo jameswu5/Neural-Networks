@@ -206,7 +206,7 @@ namespace NeuralNetworks {
             return result;
         }
 
-        public static void Display(double[,] matrix, int digits = 3) {
+        public static void Display(double[,] matrix, int digits = 6) {
             for (int i = 0; i < matrix.GetLength(0); i++) {
                 for (int j = 0; j < matrix.GetLength(1); j++) {
                     Console.Write(Math.Round(matrix[i,j], digits));
@@ -216,7 +216,7 @@ namespace NeuralNetworks {
             }
         }
     
-        public static void Display(double[][] matrix, int digits = 3) {
+        public static void Display(double[][] matrix, int digits = 6) {
             for (int i = 0; i < matrix.Length; i++) {
                 for (int j = 0; j < matrix[i].Length; j++) {
                     Console.Write(Math.Round(matrix[i][j], digits));
@@ -340,7 +340,6 @@ namespace NeuralNetworks {
             // assumes value has sigmoid already applied to it
             return value * (1 - value);
         }
-
 
         public static double MeanSquaredError(double observed, double expected) {
             return 2 * (observed - expected);

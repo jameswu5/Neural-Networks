@@ -1,4 +1,4 @@
-# Neural-Networks
+# Neural Networks
 Implementations of various neural networks from scratch in C#. This includes implementation of my own matrix operation library, activation and loss functions.
 
 ### Feedforward neural networks

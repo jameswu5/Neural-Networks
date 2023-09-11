@@ -1,22 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NeuralNetworks.Recurrent;
 
 namespace NeuralNetworks {
 
     public class Program {
 
         public static void Main() {
-            // Recurrent.Program.TrainLanguages(10);
-            // TestUtility();
-            // Feedforward.Program.TestForwardPropagation();
-            // Feedforward.Program.TestImages();
-
-            // Feedforward.DigitRecognition.TrainDefault();
-            // Feedforward.DigitRecognition.TestOneImage();
-            Feedforward.DigitRecognition.TestDefault();
-            // Feedforward.DigitRecognition.TrainOneBatch();
-            // Feedforward.DigitRecognition.TrainIndividual(5);
+            Filter.FilterFiles();
         }
     
         public static void TestUtility() {
@@ -81,9 +73,9 @@ namespace NeuralNetworks {
 
             List<double> vector6 = new List<double>() {1,2,3,4,5,6,7,8,9,10};
 
-            foreach (double d in vector6.GetRange(3,4)) {
-                Console.WriteLine(d);
-            }
+            // foreach (double d in vector6.GetRange(3,4)) {
+            //     Console.WriteLine(d);
+            // }
         }
 
     }

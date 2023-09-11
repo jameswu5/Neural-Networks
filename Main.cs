@@ -8,7 +8,8 @@ namespace NeuralNetworks {
     public class Program {
 
         public static void Main() {
-            Filter.FilterFiles();
+            // Classify.TrainLanguages(10);
+            Classify.TestNetwork();
         }
     
         public static void TestUtility() {

@@ -5,7 +5,7 @@ namespace NeuralNetworks.Recurrent {
         /// <summary>
         /// Static method that filters a file of words with some condition and rewrites it in place.
         /// </summary>
-        public static void FilterWords(string readPath, string writePath, Condition condition, int maxWords) {
+        private static void FilterWords(string readPath, string writePath, Condition condition, int maxWords) {
 
             string[] words = File.ReadAllLines(readPath);
 
@@ -36,18 +36,17 @@ namespace NeuralNetworks.Recurrent {
             return word.ToLower();
         }
 
-        // This will only be called once
         public static void FilterFiles() {
             
-            string readPathStem = "Recurrent/Language-Classification/original-words/";
+            string readPathStem  = "Recurrent/Language-Classification/original-words/";
             string writePathStem = "Recurrent/Language-Classification/longer-words/";
             Condition condition = new(5);
             int maxWords = 1000;
 
-            FilterWords(readPathStem + "dutch.txt", writePathStem + "dutch.txt", condition, maxWords);
+            FilterWords(readPathStem + "dutch.txt"  , writePathStem + "dutch.txt"  , condition, maxWords);
             FilterWords(readPathStem + "english.txt", writePathStem + "english.txt", condition, maxWords);
-            FilterWords(readPathStem + "french.txt", writePathStem + "french.txt", condition, maxWords);
-            FilterWords(readPathStem + "german.txt", writePathStem + "german.txt", condition, maxWords);
+            FilterWords(readPathStem + "french.txt" , writePathStem + "french.txt" , condition, maxWords);
+            FilterWords(readPathStem + "german.txt" , writePathStem + "german.txt" , condition, maxWords);
             FilterWords(readPathStem + "spanish.txt", writePathStem + "spanish.txt", condition, maxWords);
             FilterWords(readPathStem + "swedish.txt", writePathStem + "swedish.txt", condition, maxWords);
         }

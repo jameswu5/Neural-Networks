@@ -41,7 +41,7 @@ namespace NeuralNetworks.Recurrent {
             string readPathStem  = "Recurrent/Language-Classification/original-words/";
             string writePathStem = "Recurrent/Language-Classification/longer-words/";
             Condition condition = new(5);
-            int maxWords = 1000;
+            int maxWords = 3000;
 
             FilterWords(readPathStem + "dutch.txt"  , writePathStem + "dutch.txt"  , condition, maxWords);
             FilterWords(readPathStem + "english.txt", writePathStem + "english.txt", condition, maxWords);

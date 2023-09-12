@@ -225,9 +225,9 @@ namespace NeuralNetworks {
             }
         }
 
-        public static void Display(double[] vector, int digits = 3) {
-            foreach (double v in vector) {
-                Console.Write($"{Math.Round(v, digits)} ");
+        public static void Display<T>(IEnumerable<T> vector) {
+            foreach (T v in vector) {
+                Console.Write($"{v} ");
             }
             Console.WriteLine();
         }
@@ -401,4 +401,17 @@ namespace NeuralNetworks {
         }
     }
 
+    public static class Data {
+
+        public static List<List<T>> TrainTestSplit<T>(List<T> data, double testSize) {
+            Utility.Shuffle(data);
+            List<List<T>> splitData = new();
+
+            int splitIndex = (int)((1 - testSize) * data.Count);
+            splitData.Add(data.GetRange(0, splitIndex));
+            splitData.Add(data.GetRange(splitIndex, data.Count - splitIndex));
+
+            return splitData;
+        }
+    }
 }

@@ -25,23 +25,34 @@ namespace NeuralNetworks.Recurrent {
                 int[] input = ConvertWordToInput(word, dictionary);
                 Console.WriteLine((Languages)rnn.Predict(input));
             }
-
         }
 
-        public static void TrainLanguages(int epochs = 10) {
+        public static void TrainLanguages(int epochs = 10, bool saveNetwork = false) {
             Dictionary<char, int> vocabDictionary = GetVocabDictionary();
             List<(string , int)> data = GetLanguageData();
 
-            Vanilla rnn = new Vanilla(vocabDictionary.Count, 12, 6);
-            // RNN rnn = new RNN(path);
+            // Split into training data and test data
+            var splitData = Data.TrainTestSplit(data, 0.2);
+            var trainData = splitData[0];
+            var testData  = splitData[1];
 
+            Vanilla rnn = new Vanilla(vocabDictionary.Count, 10, 6);
+            // Vanilla rnn = new Vanilla(path);
+
+            // LSTM lstm = new LSTM(vocabDictionary.Count, 12, 6);
+
+            int[] correct;
+            int[] total;
+            double[] successRate;
+
+            // Train on the training data
             for (int i = 0; i < epochs; i++) {
-                Utility.Shuffle(data);
+                Utility.Shuffle(trainData);
 
-                int[] correct = new int[6];
-                int[] total = new int[6];
+                correct = new int[6];
+                total = new int[6];
 
-                foreach ((string word, int label) pair in data) {
+                foreach ((string word, int label) pair in trainData) {
                     int[] input = ConvertWordToInput(pair.word, vocabDictionary);
                     if (rnn.Train(input, pair.label)) {
                         correct[pair.label]++;
@@ -49,7 +60,7 @@ namespace NeuralNetworks.Recurrent {
                     total[pair.label]++;
                 }
 
-                double[] successRate = new double[6];
+                successRate = new double[6];
                 for (int j = 0; j < 6; j++) {
                     successRate[j] = Math.Round(correct[j] * 100.0 / total[j], 2);
                 }
@@ -65,8 +76,37 @@ namespace NeuralNetworks.Recurrent {
                 Console.WriteLine();
             }
 
+            // Test on the test data
+            correct = new int[6];
+            total = new int[6];
+            foreach ((string word, int label) pair in testData) {
+                int[] input = ConvertWordToInput(pair.word, vocabDictionary);
+                if (rnn.PredictAndCheck(input, pair.label)) {
+                    correct[pair.label]++;
+                }
+                total[pair.label]++;
+            }
+
+            successRate = new double[6];
+            for (int j = 0; j < 6; j++) {
+                successRate[j] = Math.Round(correct[j] * 100.0 / total[j], 2);
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("--------------- Test data ---------------");
+            Console.WriteLine($"Dutch: {successRate[0]}%");
+            Console.WriteLine($"English: {successRate[1]}%");
+            Console.WriteLine($"French: {successRate[2]}%");
+            Console.WriteLine($"German: {successRate[3]}%");
+            Console.WriteLine($"Spanish: {successRate[4]}%");
+            Console.WriteLine($"Swedish: {successRate[5]}%");
+            Console.WriteLine($"Overall: {Math.Round(correct.Sum() * 100.0 / total.Sum(), 2)}%");
+            Console.WriteLine();
+
             // Save the network
-            rnn.SaveNetwork(path);
+            if (saveNetwork) {
+                rnn.SaveNetwork(path);
+            }
         }
 
         public static List<(string, int)> GetLanguageData() {
@@ -156,6 +196,12 @@ namespace NeuralNetworks.Recurrent {
                 res[i] = dictionary[char.ToLower(word[i])];
             }
             return res;
+        }
+    
+        public static void PrepareData() {
+            string dictionaryPath = "Recurrent/Language-Classification/longer-words/characters.txt";
+            Filter.FilterFiles();
+            WriteVocabDictionaryToFile(dictionaryPath);
         }
     }
 }

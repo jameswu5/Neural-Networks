@@ -7,7 +7,7 @@ namespace NeuralNetworks {
         public static void Main() {
             // Recurrent.Classify.TrainLanguages(10, true);
             // Recurrent.Classify.TestNetwork();
-            new Reinforcement.Game(false);
+            new Reinforcement.Game(true);
         }
     }
 }

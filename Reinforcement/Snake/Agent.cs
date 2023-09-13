@@ -11,7 +11,7 @@ namespace NeuralNetworks.Reinforcement {
         public int gamesPlayed;
         double gamma;
         List<SnakeMemoryCell> memory;
-        Feedforward.Feedforward model;
+        Feedforward.Vanilla model;
         Trainer trainer;
 
         Random rng;
@@ -20,7 +20,7 @@ namespace NeuralNetworks.Reinforcement {
             gamesPlayed = 0;
             gamma = 0.9;
             memory = new List<SnakeMemoryCell>();
-            model = new Feedforward.Feedforward(new int[] {11, 256, 3});
+            model = new Feedforward.Vanilla(new int[] {11, 256, 3});
             trainer = new Trainer(model, LearnRate, gamma);
             rng = new Random();
         }

@@ -92,9 +92,6 @@ namespace NeuralNetworks.Reinforcement {
                             snake.Reset();
                             buffer = Direction.Right;
                         }
-
-                        Matrix.Display(agent.GetGameState(snake));
-
                     } else {
                         Train();
                     }

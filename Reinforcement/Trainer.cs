@@ -7,11 +7,11 @@ namespace NeuralNetworks.Reinforcement {
 
     public class Trainer {
         
-        public Feedforward.Feedforward model;
+        public Feedforward.Vanilla model;
         public double learnRate;
         public double gamma;
         
-        public Trainer(Feedforward.Feedforward model, double learnRate, double gamma) {
+        public Trainer(Feedforward.Vanilla model, double learnRate, double gamma) {
             this.model = model;
             this.learnRate = learnRate;
             this.gamma = gamma;

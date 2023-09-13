@@ -5,10 +5,11 @@ using System.Linq;
 namespace NeuralNetworks.Feedforward {
     public static class DigitRecognition {
 
+        static string path = "Feedforward/Saved-Networks/ver3.txt";
+
         public static void TrainDefault() {
-            string path = "Feedforward/Saved-Networks/ver1.txt";
             int[] layerSizes = {784, 16, 16, 10};
-            Feedforward network = new Feedforward(layerSizes);
+            Vanilla network = new Vanilla(layerSizes);
             // Feedforward network = new Feedforward(path);
             List<Image> trainingSet = DigitDataReader.ReadTrainingData();
             TrainNetwork(network, trainingSet, 100, 5);
@@ -16,13 +17,12 @@ namespace NeuralNetworks.Feedforward {
         }
 
         public static void TestDefault() {
-            string path = "Feedforward/Saved-Networks/ver1.txt";
-            Feedforward network = new Feedforward(path);
+            Vanilla network = new Vanilla(path);
             List<Image> testSet = DigitDataReader.ReadTestData();
             TestNetwork(network, testSet);
         }
 
-        public static void TrainNetwork(Feedforward network, List<Image> trainingSet, int batchSize, int epochs) {
+        public static void TrainNetwork(Vanilla network, List<Image> trainingSet, int batchSize, int epochs) {
             for (int epoch = 1; epoch <= epochs; epoch++) {
                 Console.WriteLine($"Epoch {epoch}");
                 Utility.Shuffle(trainingSet);
@@ -34,7 +34,7 @@ namespace NeuralNetworks.Feedforward {
             }
         }
 
-        public static void TrainBatch(List<Image> batch, Feedforward network) {
+        public static void TrainBatch(List<Image> batch, Vanilla network) {
 
             double[][,] weightGradients = new double[network.numberOfLayers - 1][,];
             double[][] biasGradients = new double[network.numberOfLayers - 1][];
@@ -50,7 +50,7 @@ namespace NeuralNetworks.Feedforward {
             foreach (Image image in batch) {
                 double[] outputVector = network.ForwardPropagate(image.dataArray);
                 double[] expectedVector = network.GetOneHotVector(image.label);
-                correct += Feedforward.CheckIfCorrect(outputVector, expectedVector);
+                correct += Vanilla.CheckIfCorrect(outputVector, expectedVector);
                 totalCost += Loss.MeanSquaredError(outputVector, expectedVector);
 
                 (double[][,] weight, double[][] bias) derivatives = network.BackPropagate(expectedVector);
@@ -71,13 +71,13 @@ namespace NeuralNetworks.Feedforward {
             network.UpdateWeightsAndBiases(weightGradients, biasGradients, 1);
         }
 
-        public static void TestNetwork(Feedforward network, List<Image> testSet) {
+        public static void TestNetwork(Vanilla network, List<Image> testSet) {
             int correct = 0;
             int count = 0;
             foreach (Image image in testSet) {
                 count += 1;
                 double[] outputVector = network.ForwardPropagate(image.dataArray);
-                correct += Feedforward.CheckIfCorrect(outputVector, network.GetOneHotVector(image.label));
+                correct += Vanilla.CheckIfCorrect(outputVector, network.GetOneHotVector(image.label));
                 if (count % 1000 == 0) {
                     Console.WriteLine($"{correct} {count} {Math.Round(correct * 1.0 / count, 3)}");
                 }
@@ -87,17 +87,15 @@ namespace NeuralNetworks.Feedforward {
 
         public static void TrainOneBatch() {
             List<Image> trainingSet = DigitDataReader.ReadTrainingData();
-            string path = "Feedforward/Saved-Networks/ver1.txt";
-            Feedforward network = new Feedforward(path);
+            Vanilla network = new Vanilla(path);
 
             TrainBatch(trainingSet.GetRange(0, 100), network);
         }
 
         public static void TrainIndividual(int epochs) {
-            string path = "Feedforward/Saved-Networks/ver2.txt";
             int[] layerSizes = {784, 16, 16, 10};
             // Feedforward network = new Feedforward(path);
-            Feedforward network = new Feedforward(layerSizes);
+            Vanilla network = new Vanilla(layerSizes);
             List<Image> trainingSet = DigitDataReader.ReadTrainingData();
 
 
@@ -109,7 +107,7 @@ namespace NeuralNetworks.Feedforward {
                     Image image = trainingSet[a];
                     double[] outputVector = network.ForwardPropagate(image.dataArray);
                     double[] expectedVector = network.GetOneHotVector(image.label);
-                    correct += Feedforward.CheckIfCorrect(outputVector, expectedVector);
+                    correct += Vanilla.CheckIfCorrect(outputVector, expectedVector);
                     totalCost += Loss.MeanSquaredError(outputVector, expectedVector);
 
                     (double[][,] weight, double[][] bias) derivatives = network.BackPropagate(expectedVector);

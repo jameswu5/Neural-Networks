@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace NeuralNetworks.Feedforward {
-    public class Feedforward {
+    public class Vanilla {
+        static Activation activation = new(Activation.Type.Sigmoid);
+        static Derivative derivative = new(Derivative.Type.Sigmoid);
 
         public int[] layerSizes;
         public int numberOfLayers;
@@ -14,7 +16,7 @@ namespace NeuralNetworks.Feedforward {
 
         const double learnRate = 0.05;
 
-        public Feedforward(int[] layerSizes) {
+        public Vanilla(int[] layerSizes) {
             this.layerSizes = layerSizes;
             numberOfLayers = layerSizes.Length;
 
@@ -29,7 +31,7 @@ namespace NeuralNetworks.Feedforward {
             }
         }
 
-        public Feedforward(string path) {
+        public Vanilla(string path) {
             string[] networkData = File.ReadAllLines(path);
             string[] sizeData = networkData[0].TrimEnd(' ').Split(' ');
             layerSizes = Array.ConvertAll(sizeData, int.Parse);
@@ -64,18 +66,20 @@ namespace NeuralNetworks.Feedforward {
             }
         }
 
-        public double[] ForwardPropagate(double[] vector) {
+        public double[] ForwardPropagate(double[] vector, bool normalise = true) {
             layers = new double[numberOfLayers][];
-            vector = Activation.Sigmoid(vector);
+            vector = activation.GetActivation(vector);
             layers[0] = vector;
 
             for (int i = 0; i < numberOfLayers - 1; i++) {
                 vector = Matrix.Add(Matrix.MatrixMultiply(vector, weights[i]), biases[i]);
-                vector = Activation.Sigmoid(vector);
+                vector = activation.GetActivation(vector);
                 layers[i + 1] = vector;
             }
             // apply softmax on the output vector
-            vector = Activation.Softmax(vector);
+            if (normalise) {
+                vector = Activation.Softmax(vector);
+            }
             return vector;
         }
 
@@ -86,7 +90,7 @@ namespace NeuralNetworks.Feedforward {
 
             for (int i = 0; i < expectedOutput.Length; i++) {
                 double costDerivative = Derivative.MeanSquaredError(outputLayer[i], expectedOutput[i]);
-                double activationDerivative = Derivative.Sigmoid(outputLayer[i]);
+                double activationDerivative = derivative.GetDerivative(outputLayer[i]);
                 nodeValues[i] = costDerivative * activationDerivative;
             }
             return nodeValues;
@@ -95,8 +99,8 @@ namespace NeuralNetworks.Feedforward {
         public static double[] GetHiddenLayerNodeValues(double[] hiddenLayer, double[] higherLayerNodeValues, double[,] weightMatrix) {
             double[] nodeValues = Matrix.MatrixMultiply(weightMatrix, higherLayerNodeValues);
             for (int i = 0; i < hiddenLayer.Length; i++) {
-                double derivative = Derivative.Sigmoid(hiddenLayer[i]);
-                nodeValues[i] *= derivative;
+                double deriv = derivative.GetDerivative(hiddenLayer[i]);
+                nodeValues[i] *= deriv;
             }
             return nodeValues;
         }

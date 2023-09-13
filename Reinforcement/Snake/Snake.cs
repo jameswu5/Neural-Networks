@@ -32,7 +32,6 @@ namespace NeuralNetworks.Reinforcement {
 
         public Snake() {
             rng = new Random();
-            steps = 0;
             Reset();
         }
 
@@ -41,6 +40,7 @@ namespace NeuralNetworks.Reinforcement {
             head = GetSquareID(Width / 2 , Height / 2);
             direction = Direction.Right;
             score = 0;
+            steps = 0;
             food = CreateFood();
             gameOver = false;
         }
@@ -53,8 +53,18 @@ namespace NeuralNetworks.Reinforcement {
             return newPos;
         }
 
+        public bool CheckCollision(int point, Direction dir) {
+            if      (dir == Direction.Right && GetXCoord(point) == 0) return true;
+            else if (dir == Direction.Left  && GetXCoord(point) == Width - 1) return true;
+            else if (dir == Direction.Up    && GetYCoord(point) < 0) return true;
+            else if (dir == Direction.Down  && GetYCoord(point) >= Height) return true;
 
-        public bool Move(int action) {
+            if (snake.Contains(point)) return true;
+
+            return false;
+        }
+
+        public void Move(int action) {
             int index = Array.IndexOf(Clockwise, direction);
 
             if (action == 1) {
@@ -63,38 +73,32 @@ namespace NeuralNetworks.Reinforcement {
                 direction = Clockwise[(index + 1) % 4];
             }
 
-            // Need to check for collisions
             switch (direction) {
                 case Direction.Right:
-                    if (head % Width == Width - 1) return false;
                     head++;
                     break;
                 case Direction.Left:
-                    if (head % Width == 0) return false;
                     head--;
                     break;
                 case Direction.Up:
-                    if (head / Width == 0) return false;
                     head -= Width;
                     break;
                 case Direction.Down:
-                    if (head / Width == Height - 1) return false;
                     head += Width;
                     break;
                 default:
                     break;
             }
-
-            return true;
         }
 
         // action: 0 -> straight | 1 -> left | 2 -> right
-        public (int, bool, int) Step(int action) {
+        public (int reward, bool gameOver, int score) Step(int action) {
             steps++;
             int reward = 0;
 
-            bool legal = Move(action);
-            if (!legal || snake.Contains(head) || steps > 50 * snake.Count) {
+            Move(action);
+
+            if (CheckCollision(head, direction) || steps >= 50) {
                 reward = -10;
                 gameOver = true;
                 return (reward, gameOver, score);
@@ -106,19 +110,18 @@ namespace NeuralNetworks.Reinforcement {
                 score++;
                 reward = 10;
                 food = CreateFood();
+                steps = 0;
             } else {
                 snake.RemoveAt(snake.Count - 1);
             }
-
-            DisplayUI();
-
             return (reward, gameOver, score);
         }
 
-        private int GetSquareID(int x, int y) => y * Width + x;
+        private static int GetSquareID(int x, int y) => y * Width + x;
+        public static int GetXCoord(int i) => i % Width;
+        public static int GetYCoord(int i) => i / Width;
 
-
-        private void DisplayUI() {
+        public void DisplayUI() {
             Raylib.ClearBackground(DarkGrey);
             DrawSnake();
             DrawFood();
@@ -127,8 +130,8 @@ namespace NeuralNetworks.Reinforcement {
 
         private void DrawSnake() {
             foreach (int coord in snake) {
-                int x = coord % Width;
-                int y = coord / Width;
+                int x = GetXCoord(coord);
+                int y = GetYCoord(coord);
 
                 Rectangle rect = new Rectangle(x * SquareSize, y * SquareSize, SquareSize, SquareSize);
                 Raylib.DrawRectangleRounded(rect, 0.6f, 6, Color.SKYBLUE);
@@ -136,8 +139,8 @@ namespace NeuralNetworks.Reinforcement {
         }
 
         private void DrawFood() {
-            int x = food % Width;
-            int y = food / Width;
+            int x = GetXCoord(food);
+            int y = GetYCoord(food);
             Raylib.DrawCircle(x * SquareSize + SquareSize / 2, y * SquareSize + SquareSize / 2, SquareSize / 2, Color.RED);
         }
     }

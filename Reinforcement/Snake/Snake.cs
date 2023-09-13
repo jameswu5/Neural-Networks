@@ -13,7 +13,11 @@ namespace NeuralNetworks.Reinforcement {
         public const int Height = 15;
         public const int SquareSize = 30;
 
-        static Color DarkGrey = new Color(30, 30, 30, 255);
+        static Color DarkBlueGrey = new Color(23, 30, 33, 255);
+        static Color Red = new Color(227, 132, 132, 255);
+        static Color Green1 = new Color(88, 138, 88, 255);
+        static Color Green2 = new Color(139, 196, 139, 255);
+
 
         readonly Direction[] Clockwise = { Direction.Up, Direction.Right, Direction.Down, Direction.Left };
 
@@ -54,10 +58,11 @@ namespace NeuralNetworks.Reinforcement {
         }
 
         public bool CheckCollision(int point, Direction dir) {
-            if      (dir == Direction.Right && GetXCoord(point) == 0) return true;
-            else if (dir == Direction.Left  && GetXCoord(point) == Width - 1) return true;
-            else if (dir == Direction.Up    && GetYCoord(point) < 0) return true;
-            else if (dir == Direction.Down  && GetYCoord(point) >= Height) return true;
+            if (point < 0) return true;
+            if (dir == Direction.Right && GetXCoord(point) == 0) return true;
+            if (dir == Direction.Left  && GetXCoord(point) == Width - 1) return true;
+            if (dir == Direction.Up    && point < 0) return true;
+            if (dir == Direction.Down  && GetYCoord(point) >= Height) return true;
 
             if (snake.Contains(point)) return true;
 
@@ -94,7 +99,9 @@ namespace NeuralNetworks.Reinforcement {
         // action: 0 -> straight | 1 -> left | 2 -> right
         public (int reward, bool gameOver, int score) Step(int action) {
             steps++;
-            int reward = 0;
+            int reward;
+
+            double distanceFromFood = GetDistance(head, food);
 
             Move(action);
 
@@ -112,6 +119,7 @@ namespace NeuralNetworks.Reinforcement {
                 food = CreateFood();
                 steps = 0;
             } else {
+                reward = GetDistance(head, food) < distanceFromFood ? 1 : -1;
                 snake.RemoveAt(snake.Count - 1);
             }
             return (reward, gameOver, score);
@@ -121,8 +129,14 @@ namespace NeuralNetworks.Reinforcement {
         public static int GetXCoord(int i) => i % Width;
         public static int GetYCoord(int i) => i / Width;
 
+        public static double GetDistance(int a, int b) {
+            int x1 = GetXCoord(a), y1 = GetYCoord(a);
+            int x2 = GetXCoord(b), y2 = GetYCoord(b);
+            return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
+        }
+
         public void DisplayUI() {
-            Raylib.ClearBackground(DarkGrey);
+            Raylib.ClearBackground(DarkBlueGrey);
             DrawSnake();
             DrawFood();
             Raylib.DrawText($"Score: {score}", 20, 20, 25, Color.WHITE);
@@ -134,14 +148,18 @@ namespace NeuralNetworks.Reinforcement {
                 int y = GetYCoord(coord);
 
                 Rectangle rect = new Rectangle(x * SquareSize, y * SquareSize, SquareSize, SquareSize);
-                Raylib.DrawRectangleRounded(rect, 0.6f, 6, Color.SKYBLUE);
+                Raylib.DrawRectangleRounded(rect, 0.6f, 6, Green1);
+
+                Rectangle rect2 = new Rectangle(x * SquareSize + 4, y * SquareSize + 4, SquareSize - 8, SquareSize - 8);
+                Raylib.DrawRectangleRounded(rect2, 0.6f, 6, Green2);
+
             }
         }
 
         private void DrawFood() {
             int x = GetXCoord(food);
             int y = GetYCoord(food);
-            Raylib.DrawCircle(x * SquareSize + SquareSize / 2, y * SquareSize + SquareSize / 2, SquareSize / 2, Color.RED);
+            Raylib.DrawCircle(x * SquareSize + SquareSize / 2, y * SquareSize + SquareSize / 2, SquareSize / 2, Red);
         }
     }
 }

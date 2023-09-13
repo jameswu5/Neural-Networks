@@ -4,7 +4,7 @@ namespace NeuralNetworks.Reinforcement {
 
     public class Agent {
 
-        const double LearnRate = 0.001;
+        const double LearnRate = 0.05;
         const int BatchSize = 1000;
         const int MaxMemory = 100000;
 
@@ -48,17 +48,17 @@ namespace NeuralNetworks.Reinforcement {
                 (dirIsU && game.CheckCollision(moveU, Direction.Up   )) ||
                 (dirIsD && game.CheckCollision(moveD, Direction.Down )),
 
-                // Danger to the left
-                (dirIsL && game.CheckCollision(moveD, Direction.Left )) ||
-                (dirIsR && game.CheckCollision(moveU, Direction.Right)) ||
-                (dirIsU && game.CheckCollision(moveL, Direction.Up   )) ||
-                (dirIsD && game.CheckCollision(moveR, Direction.Down )),
+                // Danger to the left (doesn't work)
+                (dirIsL && game.CheckCollision(moveD, Direction.Down )) ||
+                (dirIsR && game.CheckCollision(moveU, Direction.Up   )) ||
+                (dirIsU && game.CheckCollision(moveL, Direction.Left )) ||
+                (dirIsD && game.CheckCollision(moveR, Direction.Right )),
 
-                // Danger to the right
-                (dirIsL && game.CheckCollision(moveU, Direction.Left )) ||
-                (dirIsR && game.CheckCollision(moveD, Direction.Right)) ||
-                (dirIsU && game.CheckCollision(moveR, Direction.Up   )) ||
-                (dirIsD && game.CheckCollision(moveL, Direction.Down )),
+                // Danger to the right (doesn't work)
+                (dirIsL && game.CheckCollision(moveU, Direction.Up   )) ||
+                (dirIsR && game.CheckCollision(moveD, Direction.Down )) ||
+                (dirIsU && game.CheckCollision(moveR, Direction.Right)) ||
+                (dirIsD && game.CheckCollision(moveL, Direction.Left )),
 
                 dirIsL, dirIsR, dirIsU, dirIsD,
 
@@ -112,6 +112,10 @@ namespace NeuralNetworks.Reinforcement {
             double[] prediction = model.ForwardPropagate(inputState);
             
             return Array.IndexOf(prediction, prediction.Max());
+        }
+
+        public void SaveModel(string path) {
+            model.SaveNetwork(path);
         }
     }
 

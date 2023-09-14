@@ -36,7 +36,7 @@ namespace NeuralNetworks {
                 int n = vector.Length;
                 double[] result = new double[n];
                 for (int i = 0; i < n; i++) {
-                    result[i] = Math.Tanh(vector[i]);
+                    result[i] = Activate(vector[i]);
                 }
                 return result;
             }
@@ -84,7 +84,7 @@ namespace NeuralNetworks {
                 int n = vector.Length;
                 double[] result = new double[n];
                 for (int i = 0; i < n; i++) {
-                    result[i] = Math.Max(0, vector[i]);
+                    result[i] = Activate(vector[i]);
                 }
                 return result;
             }
@@ -96,15 +96,13 @@ namespace NeuralNetworks {
             public double[] Derivative(double[] vector) {
                 double[] res = new double[vector.Length];
                 for (int i = 0; i < vector.Length; i++) {
-                    if (vector[i] > 0) {
-                        res[i] = 1;
-                    }
+                    res[i] = Derivative(vector[i]);
                 }
                 return res;
             }
 
             public double Derivative(double value) {
-                return value > 0 ? 1 : 0;
+                return (value > 0) ? 1 : 0;
             }
         }
 
@@ -134,7 +132,6 @@ namespace NeuralNetworks {
 
             public double[] Derivative(double[] vector) {
                 throw new Exception("Not implemented Softmax.Derivative(double[] vector)");
-
             }
 
             public double Derivative(double value) {

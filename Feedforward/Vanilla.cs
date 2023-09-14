@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace NeuralNetworks.Feedforward {
     public class Vanilla {
-
-        Activation.Type activationType = Activation.Type.Sigmoid;
+        Activation.Type activationType = Activation.Type.ReLu;
         Activation.Type outputActivationType = Activation.Type.Softmax;
         Loss.Type lossType = Loss.Type.MeanSquaredError;
 
+        IActivation normaliseActivation = new Activation.Sigmoid();
         IActivation activation;
         IActivation outputActivation;
         ILoss loss;
@@ -83,7 +83,8 @@ namespace NeuralNetworks.Feedforward {
 
         public double[] ForwardPropagate(double[] vector) {
             layers = new double[numberOfLayers][];
-            vector = activation.Activate(vector);
+            // Normalise the input with sigmoid
+            vector = normaliseActivation.Activate(vector);
             layers[0] = vector;
 
             for (int i = 0; i < numberOfLayers - 1; i++) {

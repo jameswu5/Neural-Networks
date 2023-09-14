@@ -6,7 +6,6 @@ namespace NeuralNetworks.Feedforward {
     public static class DigitRecognition {
 
         static string path = "Feedforward/Digit-Recognition/Saved-Networks/ver3.txt";
-
         static ILoss loss = Loss.GetLossFromType(Loss.Type.MeanSquaredError);
 
         public static void TrainDefault() {
@@ -86,7 +85,6 @@ namespace NeuralNetworks.Feedforward {
             }
         }
 
-
         public static void TrainOneBatch() {
             List<Image> trainingSet = DigitDataReader.ReadTrainingData();
             Vanilla network = new Vanilla(path);
@@ -121,7 +119,6 @@ namespace NeuralNetworks.Feedforward {
                 double averageCost = totalCost / trainingSet.Count;
                 Console.WriteLine($"Epoch {epoch}: {correct}/{trainingSet.Count} correct ({Math.Round(correct * 100.0 / trainingSet.Count, 2)}%), cost {averageCost}");
             }
-
 
             network.SaveNetwork(path);
         }

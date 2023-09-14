@@ -19,6 +19,14 @@ namespace NeuralNetworks.Recurrent {
         int sequenceLength;
         double[] previousHiddenState;
 
+        Activation.Type activationType = Activation.Type.Tanh;
+        Activation.Type outputActivationType = Activation.Type.Softmax;
+        Loss.Type lossType = Loss.Type.CrossEntropy;
+
+        IActivation activation;
+        IActivation outputActivation;
+        ILoss loss;
+
         // creating a new network
         public Vanilla(int inputSize, int hiddenSize, int outputSize) {
             this.inputSize = inputSize;
@@ -33,12 +41,20 @@ namespace NeuralNetworks.Recurrent {
             biasC = new double[outputSize];
 
             previousHiddenState = new double[hiddenSize];
+
+            activation = Activation.GetActivationFromType(activationType);
+            outputActivation = Activation.GetActivationFromType(outputActivationType);
+            loss = Loss.GetLossFromType(lossType);
         }
 
         // importing a network
         public Vanilla(string importFileName) {
             ImportNetwork(importFileName);
             previousHiddenState = new double[hiddenSize];
+
+            activation = Activation.GetActivationFromType(activationType);
+            outputActivation = Activation.GetActivationFromType(outputActivationType);
+            loss = Loss.GetLossFromType(lossType);
         }
 
         public (double[][] inputStates, double[][] hiddenStates, double[][] outputStates) ForwardPropagate(int[] input) {
@@ -61,10 +77,10 @@ namespace NeuralNetworks.Recurrent {
                 }
                 double[] Ux = Matrix.MatrixMultiply(weightsU, inputStates[time]);
                 double[] a = Matrix.Add(biasB, Wh, Ux);
-                hiddenStates[time] = Activation.Tanh(a);
+                hiddenStates[time] = activation.Activate(a);
 
                 double[] o = Matrix.Add(biasC, Matrix.MatrixMultiply(weightsV, hiddenStates[time]));
-                outputStates[time] = Activation.Softmax(o);
+                outputStates[time] = outputActivation.Activate(o);
             }
 
             return (inputStates, hiddenStates, outputStates);
@@ -87,7 +103,7 @@ namespace NeuralNetworks.Recurrent {
             double[] dh = Matrix.MatrixMultiply(Matrix.Transpose(weightsV), dy);
 
             for (int t = sequenceLength - 1; t >= 0; t--) {
-                double[] temp = Matrix.MultiplyVectorElementwise(Derivative.Tanh(hiddenStates[t]), dh);
+                double[] temp = Matrix.MultiplyVectorElementwise(activation.Derivative(hiddenStates[t]), dh);
                 db = Matrix.Add(db, temp);
                 double[] prevHiddenState = t == 0 ? previousHiddenState : hiddenStates[t - 1];
                 dW = Matrix.Add(dW, Matrix.MatrixMultiply(temp, prevHiddenState));
@@ -117,7 +133,7 @@ namespace NeuralNetworks.Recurrent {
             double[] expectedOutput = new double[outputSize];
             expectedOutput[target] = 1;
 
-            double cost = Loss.CrossEntropy(predictedOutput, expectedOutput);
+            double cost = loss.LossFunction(predictedOutput, expectedOutput);
             return cost;
         }
     

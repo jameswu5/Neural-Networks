@@ -6,10 +6,10 @@ namespace NeuralNetworks.Feedforward {
     // credit to stackoverflow.com/questions/49407772/reading-mnist-database
     public static class DigitDataReader {
         
-        public const string TrainImages = "Feedforward/Digit-Data/train-images.idx3-ubyte";
-        public const string TrainLabels = "Feedforward/Digit-Data/train-labels.idx1-ubyte";
-        public const string TestImages = "Feedforward/Digit-Data/test-images.idx3-ubyte";
-        public const string TestLabels = "Feedforward/Digit-Data/test-labels.idx1-ubyte";
+        public const string TrainImages = "Feedforward/Digit-Recognition/Digit-Data/train-images.idx3-ubyte";
+        public const string TrainLabels = "Feedforward/Digit-Recognition/Digit-Data/train-labels.idx1-ubyte";
+        public const string TestImages = "Feedforward/Digit-Recognition/Digit-Data/test-images.idx3-ubyte";
+        public const string TestLabels = "Feedforward/Digit-Recognition/Digit-Data/test-labels.idx1-ubyte";
 
         public static List<Image> ReadTrainingData()
         {

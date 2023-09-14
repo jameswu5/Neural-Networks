@@ -5,7 +5,9 @@ using System.Linq;
 namespace NeuralNetworks.Feedforward {
     public static class DigitRecognition {
 
-        static string path = "Feedforward/Saved-Networks/ver3.txt";
+        static string path = "Feedforward/Digit-Recognition/Saved-Networks/ver3.txt";
+
+        static ILoss loss = Loss.GetLossFromType(Loss.Type.MeanSquaredError);
 
         public static void TrainDefault() {
             int[] layerSizes = {784, 16, 16, 10};
@@ -51,7 +53,7 @@ namespace NeuralNetworks.Feedforward {
                 double[] outputVector = network.ForwardPropagate(image.dataArray);
                 double[] expectedVector = network.GetOneHotVector(image.label);
                 correct += Vanilla.CheckIfCorrect(outputVector, expectedVector);
-                totalCost += Loss.MeanSquaredError(outputVector, expectedVector);
+                totalCost += loss.LossFunction(outputVector, expectedVector);
 
                 (double[][,] weight, double[][] bias) derivatives = network.BackPropagate(expectedVector);
                 
@@ -108,7 +110,7 @@ namespace NeuralNetworks.Feedforward {
                     double[] outputVector = network.ForwardPropagate(image.dataArray);
                     double[] expectedVector = network.GetOneHotVector(image.label);
                     correct += Vanilla.CheckIfCorrect(outputVector, expectedVector);
-                    totalCost += Loss.MeanSquaredError(outputVector, expectedVector);
+                    totalCost += loss.LossFunction(outputVector, expectedVector);
 
                     (double[][,] weight, double[][] bias) derivatives = network.BackPropagate(expectedVector);
                     network.UpdateWeightsAndBiases(derivatives.weight, derivatives.bias);

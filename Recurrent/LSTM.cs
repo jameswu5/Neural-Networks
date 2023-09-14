@@ -38,6 +38,10 @@ namespace NeuralNetworks.Recurrent {
         double[][] inputGates = null!;
         double[][] outputs = null!;
 
+        IActivation tanh = new Activation.Tanh();
+        IActivation sigmoid = new Activation.Sigmoid();
+        IActivation softmax = new Activation.Softmax();
+        ILoss crossEntropy = new Loss.CrossEntropy();
 
         public LSTM(int inputSize, int hiddenSize, int outputSize) {
             this.inputSize  = inputSize;
@@ -99,20 +103,20 @@ namespace NeuralNetworks.Recurrent {
                 double[] concatenatedInputs = Matrix.Concatenate(prevHiddenState, input);
                 inputStates[t] = concatenatedInputs;
 
-                forgetGates[t]    = Activation.Sigmoid(Matrix.Add(Matrix.MatrixMultiply(weightsForget, concatenatedInputs), biasesForget));
-                inputGates[t]     = Activation.Sigmoid(Matrix.Add(Matrix.MatrixMultiply(weightsInput, concatenatedInputs), biasesInput));
-                candidateGates[t] = Activation.Tanh(Matrix.Add(Matrix.MatrixMultiply(weightsCandidate, concatenatedInputs), biasesCandidate));
-                outputGates[t]    = Activation.Sigmoid(Matrix.Add(Matrix.MatrixMultiply(weightsOutput, concatenatedInputs), biasesOutput));
+                forgetGates[t]    = sigmoid.Activate(Matrix.Add(Matrix.MatrixMultiply(weightsForget, concatenatedInputs), biasesForget));
+                inputGates[t]     = sigmoid.Activate(Matrix.Add(Matrix.MatrixMultiply(weightsInput, concatenatedInputs), biasesInput));
+                candidateGates[t] = tanh.Activate(Matrix.Add(Matrix.MatrixMultiply(weightsCandidate, concatenatedInputs), biasesCandidate));
+                outputGates[t]    = sigmoid.Activate(Matrix.Add(Matrix.MatrixMultiply(weightsOutput, concatenatedInputs), biasesOutput));
 
                 cellStates[t] = Matrix.Add(Matrix.MultiplyVectorElementwise(forgetGates[t], prevCellState), Matrix.MultiplyVectorElementwise(inputGates[t], candidateGates[t]));
-                hiddenStates[t] = Matrix.MultiplyVectorElementwise(outputGates[t], Activation.Tanh(cellStates[t]));
+                hiddenStates[t] = Matrix.MultiplyVectorElementwise(outputGates[t], tanh.Activate(cellStates[t]));
 
                 outputs[t] = Matrix.Add(Matrix.MatrixMultiply(weightsFinal, hiddenStates[t]), biasesFinal);
             }
 
             // Matrix.Display(Activation.Softmax(outputs[^1]));
 
-            return Activation.Softmax(outputs[^1]);
+            return softmax.Activate(outputs[^1]);
         }
 
         public void BackPropagate(int target, bool train = true) {
@@ -138,7 +142,7 @@ namespace NeuralNetworks.Recurrent {
 
                 double[] prevCellState = t == 0 ? new double[hiddenSize] : cellStates[t - 1];
 
-                double[] error = Activation.Softmax(outputs[t]);
+                double[] error = softmax.Activate(outputs[t]);
                 error[target] -= 1;
 
                 // Final gate
@@ -151,32 +155,32 @@ namespace NeuralNetworks.Recurrent {
 
                 // Output gate
                 double[] outputTemp = Matrix.MultiplyVectorElementwise(cellStates[t], d_hidden);
-                outputTemp = Matrix.MultiplyVectorElementwise(outputTemp, Derivative.Sigmoid(outputGates[t]));
-                outputTemp = Activation.Tanh(outputTemp);
+                outputTemp = Matrix.MultiplyVectorElementwise(outputTemp, sigmoid.Derivative(outputGates[t]));
+                outputTemp = tanh.Activate(outputTemp);
                 d_weightsOutput = Matrix.Add(d_weightsOutput, Matrix.MatrixMultiply(outputTemp, inputStates[t]));
                 d_biasesOutput = Matrix.Add(d_biasesOutput, outputTemp);
 
                 // Cell state error
-                double[] d_cell = Derivative.Tanh(Activation.Tanh(cellStates[t]));
+                double[] d_cell = tanh.Derivative(tanh.Activate(cellStates[t]));
                 d_cell = Matrix.MultiplyVectorElementwise(d_cell, outputGates[t]);
                 d_cell = Matrix.MultiplyVectorElementwise(d_cell, d_hidden);
                 d_cell = Matrix.Add(d_cell, d_nextCell);
 
                 // Forget gate
                 double[] forgetTemp = Matrix.MultiplyVectorElementwise(d_cell, prevCellState);
-                forgetTemp = Matrix.MultiplyVectorElementwise(forgetTemp, Derivative.Sigmoid(forgetGates[t]));
+                forgetTemp = Matrix.MultiplyVectorElementwise(forgetTemp, sigmoid.Derivative(forgetGates[t]));
                 d_weightsForget = Matrix.Add(d_weightsForget, Matrix.MatrixMultiply(forgetTemp, inputStates[t]));
                 d_biasesForget = Matrix.Add(d_biasesForget, forgetTemp);
 
                 // Input gate
                 double[] inputTemp = Matrix.MultiplyVectorElementwise(d_cell, candidateGates[t]);
-                inputTemp = Matrix.MultiplyVectorElementwise(inputTemp, Derivative.Sigmoid(inputGates[t]));
+                inputTemp = Matrix.MultiplyVectorElementwise(inputTemp, sigmoid.Derivative(inputGates[t]));
                 d_weightsInput = Matrix.Add(d_weightsInput, Matrix.MatrixMultiply(inputTemp, inputStates[t]));
                 d_biasesInput = Matrix.Add(d_biasesInput, inputTemp);
 
                 // Candidate gate
                 double[] candidateTemp = Matrix.MultiplyVectorElementwise(d_cell, inputGates[t]);
-                candidateTemp = Matrix.MultiplyVectorElementwise(candidateTemp, Derivative.Tanh(candidateGates[t]));
+                candidateTemp = Matrix.MultiplyVectorElementwise(candidateTemp, tanh.Derivative(candidateGates[t]));
                 d_weightsCandidate = Matrix.Add(d_weightsCandidate, Matrix.MatrixMultiply(candidateTemp, inputStates[t]));
                 d_biasesCandidate = Matrix.Add(d_biasesCandidate, candidateTemp);
 
@@ -239,7 +243,7 @@ namespace NeuralNetworks.Recurrent {
             double[] expectedOutput = new double[outputSize];
             expectedOutput[target] = 1;
 
-            double cost = Loss.CrossEntropy(probs, expectedOutput);
+            double cost = crossEntropy.LossFunction(probs, expectedOutput);
             return cost;
         }
 

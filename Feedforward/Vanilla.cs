@@ -1,11 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NeuralNetworks.Feedforward {
     public class Vanilla {
-        static Activation activation = new(Activation.Type.Sigmoid);
-        static Derivative derivative = new(Derivative.Type.Sigmoid);
+
+        Activation.Type activationType = Activation.Type.Sigmoid;
+        Activation.Type outputActivationType = Activation.Type.Softmax;
+        Loss.Type lossType = Loss.Type.MeanSquaredError;
+
+        IActivation activation;
+        IActivation outputActivation;
+        ILoss loss;
 
         public int[] layerSizes;
         public int numberOfLayers;
@@ -29,6 +36,10 @@ namespace NeuralNetworks.Feedforward {
                 weights[i - 1] = Matrix.InitialiseWeights(layerSizes[i-1], layerSizes[i]);
                 biases[i - 1] = new double[layerSizes[i]];
             }
+
+            activation = Activation.GetActivationFromType(activationType);
+            outputActivation = Activation.GetActivationFromType(outputActivationType);
+            loss = Loss.GetLossFromType(lossType);
         }
 
         public Vanilla(string path) {
@@ -64,22 +75,25 @@ namespace NeuralNetworks.Feedforward {
                 }
                 biases[i] = biasVector;
             }
+
+            activation = Activation.GetActivationFromType(activationType);
+            outputActivation = Activation.GetActivationFromType(outputActivationType);
+            loss = Loss.GetLossFromType(lossType);
         }
 
-        public double[] ForwardPropagate(double[] vector, bool normalise = true) {
+        public double[] ForwardPropagate(double[] vector) {
             layers = new double[numberOfLayers][];
-            vector = activation.GetActivation(vector);
+            vector = activation.Activate(vector);
             layers[0] = vector;
 
             for (int i = 0; i < numberOfLayers - 1; i++) {
                 vector = Matrix.Add(Matrix.MatrixMultiply(vector, weights[i]), biases[i]);
-                vector = activation.GetActivation(vector);
+                vector = activation.Activate(vector);
                 layers[i + 1] = vector;
             }
-            // apply softmax on the output vector
-            if (normalise) {
-                vector = Activation.Softmax(vector);
-            }
+
+            vector = outputActivation.Activate(vector);
+            
             return vector;
         }
 
@@ -89,17 +103,17 @@ namespace NeuralNetworks.Feedforward {
             double[] outputLayer = layers[^1];
 
             for (int i = 0; i < expectedOutput.Length; i++) {
-                double costDerivative = Derivative.MeanSquaredError(outputLayer[i], expectedOutput[i]);
-                double activationDerivative = derivative.GetDerivative(outputLayer[i]);
+                double costDerivative = loss.LossDerivative(outputLayer[i], expectedOutput[i]);
+                double activationDerivative = activation.Derivative(outputLayer[i]);
                 nodeValues[i] = costDerivative * activationDerivative;
             }
             return nodeValues;
         }
 
-        public static double[] GetHiddenLayerNodeValues(double[] hiddenLayer, double[] higherLayerNodeValues, double[,] weightMatrix) {
+        public double[] GetHiddenLayerNodeValues(double[] hiddenLayer, double[] higherLayerNodeValues, double[,] weightMatrix) {
             double[] nodeValues = Matrix.MatrixMultiply(weightMatrix, higherLayerNodeValues);
             for (int i = 0; i < hiddenLayer.Length; i++) {
-                double deriv = derivative.GetDerivative(hiddenLayer[i]);
+                double deriv = activation.Derivative(hiddenLayer[i]);
                 nodeValues[i] *= deriv;
             }
             return nodeValues;

@@ -153,7 +153,22 @@ namespace NeuralNetworks.Reinforcement {
                 Rectangle rect2 = new Rectangle(x * SquareSize + 4, y * SquareSize + 4, SquareSize - 8, SquareSize - 8);
                 Raylib.DrawRectangleRounded(rect2, 0.6f, 6, Green2);
 
+
             }
+            // Eyes
+            if (direction == Direction.Up || direction == Direction.Left) {
+                Raylib.DrawCircle(GetXCoord(head) * SquareSize + SquareSize / 3, GetYCoord(head) * SquareSize + SquareSize / 3, 2, DarkBlueGrey);
+            }
+            if (direction == Direction.Up || direction == Direction.Right) {
+                Raylib.DrawCircle(GetXCoord(head) * SquareSize + 2 * SquareSize / 3, GetYCoord(head) * SquareSize + SquareSize / 3, 2, DarkBlueGrey);
+            }
+            if (direction == Direction.Down || direction == Direction.Left) {
+                Raylib.DrawCircle(GetXCoord(head) * SquareSize + SquareSize / 3, GetYCoord(head) * SquareSize + 2 * SquareSize / 3, 2, DarkBlueGrey);
+            }
+            if (direction == Direction.Down || direction == Direction.Right) {
+                Raylib.DrawCircle(GetXCoord(head) * SquareSize + 2 * SquareSize / 3, GetYCoord(head) * SquareSize + 2 * SquareSize / 3, 2, DarkBlueGrey);
+            }
+
         }
 
         private void DrawFood() {

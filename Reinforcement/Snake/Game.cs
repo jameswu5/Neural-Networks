@@ -31,7 +31,7 @@ namespace NeuralNetworks.Reinforcement {
         public void Train() {
             int[] oldState = agent.GetGameState(snake);
             int move = agent.GetAction(oldState);
-            var info = snake.Step(move);
+            var info = snake.Step(move, true);
             int[] newState = agent.GetGameState(snake);
 
             agent.TrainShortMemory(oldState, move, info.reward, newState, info.gameOver);

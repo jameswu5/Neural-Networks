@@ -5,15 +5,18 @@ using System.Linq;
 namespace NeuralNetworks.Feedforward {
     public static class DigitRecognition {
 
-        static string path = "Feedforward/Digit-Recognition/Saved-Networks/ver3.txt";
+        static string path = "Feedforward/Digit-Recognition/Saved-Networks/ver4.txt";
         static ILoss loss = Loss.GetLossFromType(Loss.Type.MeanSquaredError);
 
+        // -- Hyperparameters --
+        const int BatchSize = 32;
+        const int Epochs = 5;
+        static int[] LayerSizes = {784, 100, 10};
+
         public static void TrainDefault() {
-            int[] layerSizes = {784, 16, 16, 10};
-            Vanilla network = new Vanilla(layerSizes);
-            // Feedforward network = new Feedforward(path);
+            Vanilla network = new Vanilla(LayerSizes);
             List<Image> trainingSet = DigitDataReader.ReadTrainingData();
-            TrainNetwork(network, trainingSet, 100, 5);
+            TrainNetwork(network, trainingSet, BatchSize, Epochs);
             network.SaveNetwork(path);
         }
 
@@ -35,7 +38,7 @@ namespace NeuralNetworks.Feedforward {
             }
         }
 
-        public static void TrainBatch(List<Image> batch, Vanilla network) {
+        private static void TrainBatch(List<Image> batch, Vanilla network) {
 
             double[][,] weightGradients = new double[network.numberOfLayers - 1][,];
             double[][] biasGradients = new double[network.numberOfLayers - 1][];
@@ -92,10 +95,8 @@ namespace NeuralNetworks.Feedforward {
             TrainBatch(trainingSet.GetRange(0, 100), network);
         }
 
-        public static void TrainIndividual(int epochs) {
-            int[] layerSizes = {784, 16, 16, 10};
-            // Feedforward network = new Feedforward(path);
-            Vanilla network = new Vanilla(layerSizes);
+        public static void TrainIndividual(int epochs = Epochs) {
+            Vanilla network = new Vanilla(LayerSizes);
             List<Image> trainingSet = DigitDataReader.ReadTrainingData();
 
 

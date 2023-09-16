@@ -9,7 +9,7 @@ namespace NeuralNetworks.Reinforcement {
     public enum Direction { Up, Right, Down, Left };
 
     public class Snake {
-        public const int Width = 20;
+        public const int Width = 24;
         public const int Height = 15;
         public const int SquareSize = 30;
 
@@ -17,7 +17,6 @@ namespace NeuralNetworks.Reinforcement {
         static Color Red = new Color(227, 132, 132, 255);
         static Color Green1 = new Color(88, 138, 88, 255);
         static Color Green2 = new Color(139, 196, 139, 255);
-
 
         readonly Direction[] Clockwise = { Direction.Up, Direction.Right, Direction.Down, Direction.Left };
 
@@ -97,7 +96,7 @@ namespace NeuralNetworks.Reinforcement {
         }
 
         // action: 0 -> straight | 1 -> left | 2 -> right
-        public (int reward, bool gameOver, int score) Step(int action) {
+        public (int reward, bool gameOver, int score) Step(int action, bool trainMode = false) {
             steps++;
             int reward;
 
@@ -105,7 +104,7 @@ namespace NeuralNetworks.Reinforcement {
 
             Move(action);
 
-            if (CheckCollision(head, direction) || steps >= 50) {
+            if (CheckCollision(head, direction) || (trainMode && steps > 50)) {
                 reward = -10;
                 gameOver = true;
                 return (reward, gameOver, score);

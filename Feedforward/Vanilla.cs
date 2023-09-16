@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace NeuralNetworks.Feedforward {
     public class Vanilla {
-        Activation.Type activationType = Activation.Type.ReLu;
+        Activation.Type activationType = Activation.Type.Sigmoid;
         Activation.Type outputActivationType = Activation.Type.Softmax;
         Loss.Type lossType = Loss.Type.MeanSquaredError;
 

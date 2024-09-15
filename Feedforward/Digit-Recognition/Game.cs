@@ -19,6 +19,7 @@ public class Game
     public const int VerPadding = 80;
 
     public int[,] pixels;
+    public int[,] input; // processed pixels
 
     public Vanilla network;
 
@@ -32,7 +33,7 @@ public class Game
     {
         HandleInput();
         DrawCanvas();
-        TestCentreOfMass();
+        DrawInput();
     }
 
     private void HandleInput()
@@ -65,6 +66,21 @@ public class Game
 
         // Draw outline
         DrawRectangleLines(HorPadding, VerPadding, CanvasLength, CanvasLength, Color.WHITE);
+    }
+
+    private void DrawInput()
+    {
+        // Draw pixels
+        for (int x = 0; x < Resolution; x++)
+        {
+            for (int y = 0; y < Resolution; y++)
+            {
+                int value = input[x, y];
+                DrawRectangle(HorPadding * 2 + x * SideLength + CanvasLength, VerPadding + y * SideLength, SideLength, SideLength, new Color(value, value, value, 255));
+            }
+        }
+
+        DrawRectangleLines(HorPadding * 2 + CanvasLength, VerPadding, CanvasLength, CanvasLength, Color.WHITE);
     }
 
     public void Simulate()
@@ -119,7 +135,7 @@ public class Game
 
 
     // Process canvas
-    private (int, int)? GetCentreOfMass()
+    private (int, int)? GetCentreOfMass(int[,] matrix)
     {
         int totalMass = 0;
         int HorMoment = 0;
@@ -129,7 +145,7 @@ public class Game
         {
             for (int j = 0; j < Resolution; j++)
             {
-                int mass = pixels[i, j];
+                int mass = matrix[i, j];
                 totalMass += mass;
                 HorMoment += i * mass;
                 VerMoment += j * mass;
@@ -146,7 +162,7 @@ public class Game
 
     private void TestCentreOfMass()
     {
-        (int x, int y)? centreOfMass = GetCentreOfMass();
+        (int x, int y)? centreOfMass = GetCentreOfMass(pixels);
         if (centreOfMass != null)
         {
             (int x, int y) = centreOfMass.Value;
@@ -154,6 +170,78 @@ public class Game
 
             // Label the pixel at the centre of mass
             DrawRectangle(HorPadding + x * SideLength, VerPadding + y * SideLength, SideLength, SideLength, PastelGreen);
+        }
+    }
+
+    private void ProcessCanvas()
+    {
+        // Remove the zero rows and columns
+        int[,] resizedPixels = (int[,])pixels.Clone();
+        int total = resizedPixels.Cast<int>().Sum();
+        if (total != 0)
+        {
+            while (resizedPixels.GetLength(0) > 0 && SumRow(resizedPixels, 0) == 0)
+            {
+                resizedPixels = RemoveRow(resizedPixels, 0);
+            }
+
+            while (resizedPixels.GetLength(0) > 0 && SumRow(resizedPixels, resizedPixels.GetLength(0) - 1) == 0)
+            {
+                resizedPixels = RemoveRow(resizedPixels, resizedPixels.GetLength(0) - 1);
+            }
+
+            while (resizedPixels.GetLength(1) > 0 && SumColumn(resizedPixels, 0) == 0)
+            {
+                resizedPixels = RemoveColumn(resizedPixels, 0);
+            }
+
+            while (resizedPixels.GetLength(1) > 0 && SumColumn(resizedPixels, resizedPixels.GetLength(1) - 1) == 0)
+            {
+                resizedPixels = RemoveColumn(resizedPixels, resizedPixels.GetLength(1) - 1);
+            }
+        }
+
+        // Resize the image to 20 by 20
+        int rows = resizedPixels.GetLength(0);
+        int cols = resizedPixels.GetLength(1);
+        double factor;
+
+        if (rows > cols)
+        {
+            factor = 20.0 / rows;
+            rows = 20;
+            cols = (int)(Math.Round(cols * factor));
+            CvInvoke.Resize(resizedPixels, resizedPixels, new Size(rows, cols), 0, 0, Inter.Linear);
+        }
+        else
+        {
+            factor = 20.0 / rows;
+            cols = 20;
+            rows = (int)(Math.Round(rows * factor));
+            CvInvoke.Resize(resizedPixels, resizedPixels, new Size(rows, cols), 0, 0, Inter.Linear);
+        }
+
+        // Shift by centre of mass
+        (int x, int y)? centreOfMass = GetCentreOfMass();
+
+        if (centreOfMass != null)
+        {
+            Array.Clear(input);
+            (int x, int y) = centreOfMass.Value;
+            int xShift = 15 - x;
+            int yShift = 15 - y;
+
+            // This is not efficient, but it is simple
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    if (i + xShift >= 0 && i + xShift < 28 && j + yShift >= 0 && j + yShift < 28)
+                    {
+                        input[i + xShift, j + yShift] = resizedPixels[i, j];
+                    }
+                }
+            }
         }
     }
 }

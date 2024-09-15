@@ -28,13 +28,14 @@ public class Game
         pixels = new int[Resolution, Resolution];
     }
 
-    public void Update()
+    private void Update()
     {
         HandleInput();
         DrawCanvas();
+        TestCentreOfMass();
     }
 
-    public void HandleInput()
+    private void HandleInput()
     {
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
         {
@@ -50,7 +51,7 @@ public class Game
         }
     }
 
-    public void DrawCanvas()
+    private void DrawCanvas()
     {
         // Draw pixels
         for (int x = 0; x < Resolution; x++)
@@ -82,12 +83,12 @@ public class Game
         CloseWindow();
     }
 
-    public void SetPixel(int x, int y, int value)
+    private void SetPixel(int x, int y, int value)
     {
         pixels[x, y] = value;
     }
 
-    public static (int, int)? GetCoordinates(int x, int y)
+    private static (int, int)? GetCoordinates(int x, int y)
     {
         int xCoord = (x - HorPadding) / SideLength;
         int yCoord = (y - VerPadding) / SideLength;
@@ -100,7 +101,7 @@ public class Game
         return null;
     }
 
-    public void ModifyCanvas(int mouseX, int mouseY, bool isDraw)
+    private void ModifyCanvas(int mouseX, int mouseY, bool isDraw)
     {
         (int, int)? coordinates = GetCoordinates(mouseX, mouseY);
 
@@ -111,8 +112,48 @@ public class Game
         }
     }
 
-    public void Clear()
+    private void Clear()
     {
         Array.Clear(pixels);
+    }
+
+
+    // Process canvas
+    private (int, int)? GetCentreOfMass()
+    {
+        int totalMass = 0;
+        int HorMoment = 0;
+        int VerMoment = 0;
+
+        for (int i = 0; i < Resolution; i++)
+        {
+            for (int j = 0; j < Resolution; j++)
+            {
+                int mass = pixels[i, j];
+                totalMass += mass;
+                HorMoment += i * mass;
+                VerMoment += j * mass;
+            }
+        }
+
+        if (totalMass == 0)
+        {
+            return null;
+        }
+
+        return (HorMoment / totalMass, VerMoment / totalMass);
+    }
+
+    private void TestCentreOfMass()
+    {
+        (int x, int y)? centreOfMass = GetCentreOfMass();
+        if (centreOfMass != null)
+        {
+            (int x, int y) = centreOfMass.Value;
+            DrawText($"Centre of mass: ({x}, {y})", 20, 20, 20, Color.WHITE);
+
+            // Label the pixel at the centre of mass
+            DrawRectangle(HorPadding + x * SideLength, VerPadding + y * SideLength, SideLength, SideLength, PastelGreen);
+        }
     }
 }

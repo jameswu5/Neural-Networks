@@ -125,7 +125,7 @@ namespace NeuralNetworks.Feedforward {
         }
 
         public static void PlayGame() {
-            Game game = new();
+            Game game = new(new Vanilla(LayerSizes));
             game.Simulate();
         }
     }

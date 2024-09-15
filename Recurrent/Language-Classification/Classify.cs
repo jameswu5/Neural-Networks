@@ -36,7 +36,7 @@ namespace NeuralNetworks.Recurrent {
             var trainData = splitData[0];
             var testData  = splitData[1];
 
-            Vanilla rnn = new Vanilla(vocabDictionary.Count, 10, 6);
+            Vanilla rnn = new Vanilla(vocabDictionary.Count, 12, 6);
             // Vanilla rnn = new Vanilla(path);
 
             // LSTM lstm = new LSTM(vocabDictionary.Count, 12, 6);

@@ -36,8 +36,8 @@ namespace NeuralNetworks.Reinforcement {
 
             target[action] = Q;
 
-            var gradients = model.BackPropagate(target);
-            model.UpdateWeightsAndBiases(gradients.weightDerivatives, gradients.biasDerivatives, learnRate);
+            var (weightDerivatives, biasDerivatives) = model.BackPropagate(target);
+            model.UpdateWeightsAndBiases(weightDerivatives, biasDerivatives, learnRate);
         }
     }
 }

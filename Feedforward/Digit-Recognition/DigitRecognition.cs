@@ -5,13 +5,13 @@ using System.Linq;
 namespace NeuralNetworks.Feedforward {
     public static class DigitRecognition {
 
-        static string path = "Feedforward/Digit-Recognition/Saved-Networks/ver4.txt";
+        static string path = "Feedforward/Digit-Recognition/Saved-Networks/ver1.txt";
         static ILoss loss = Loss.GetLossFromType(Loss.Type.MeanSquaredError);
 
         // -- Hyperparameters --
         const int BatchSize = 32;
-        const int Epochs = 5;
-        static int[] LayerSizes = {784, 100, 10};
+        const int Epochs = 1;
+        static int[] LayerSizes = {784, 16, 16, 10};
 
         public static void TrainDefault() {
             Vanilla network = new Vanilla(LayerSizes);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Globalization;
 
 namespace NeuralNetworks.Feedforward {
     public class Vanilla {
@@ -60,7 +61,7 @@ namespace NeuralNetworks.Feedforward {
                 for (int j = 0; j < layerSizes[i]; j++) {
                     string[] row = networkData[pointer + j].Split(' ');
                     for (int k = 0; k < layerSizes[i+1]; k++) {
-                        weightMatrix[j, k] = double.Parse(row[k]);
+                        weightMatrix[j, k] = double.Parse(row[k], CultureInfo.InvariantCulture);
                     }
                 }
                 weights[i] = weightMatrix;
@@ -71,7 +72,7 @@ namespace NeuralNetworks.Feedforward {
                 double[] biasVector = new double[layerSizes[i+1]];
                 string[] row = networkData[pointer].Split(' ');
                 for (int j = 0; j < layerSizes[i+1]; j++) {
-                    biasVector[j] = double.Parse(row[j]);
+                    biasVector[j] = double.Parse(row[j], CultureInfo.InvariantCulture);
                 }
                 biases[i] = biasVector;
             }

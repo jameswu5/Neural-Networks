@@ -13,7 +13,7 @@ public class Canvas
     private int horOffset;
     private int verOffset;
 
-    private int[,] pixels;
+    public int[,] pixels;
 
     public Canvas(int horOffset, int verOffset, int[,]? pixels = null)
     {
@@ -74,9 +74,9 @@ public class Canvas
         int horMoment = 0;
         int verMoment = 0;
 
-        for (int i = 0; i < Resolution; i++)
+        for (int i = 0; i < matrix.GetLength(0); i++)
         {
-            for (int j = 0; j < Resolution; j++)
+            for (int j = 0; j < matrix.GetLength(1); j++)
             {
                 int mass = matrix[i, j];
                 totalMass += mass;
@@ -93,7 +93,7 @@ public class Canvas
         return (horMoment / totalMass, verMoment / totalMass);
     }
 
-    private int[,] ProcessCanvas()
+    public int[,] ProcessCanvas()
     {
         // Identify (and ignore) the zero rows and columns
         (int top, int bottom, int left, int right) r = FindSmallestRectangle(pixels);
@@ -121,8 +121,8 @@ public class Canvas
         {
             Array.Clear(result);
             (int x, int y) = centreOfMass.Value;
-            int xShift = 15 - x;
-            int yShift = 15 - y;
+            int xShift = 13 - x;
+            int yShift = 13 - y;
 
             // This is not efficient, but it is simple
             for (int i = 0; i < 20; i++)
@@ -174,7 +174,7 @@ public class Canvas
         return (top, bottom, left, right);
     }
 
-    public static int[,] ResizeImage(int[,] original, int newRows, int newCols)
+    private static int[,] ResizeImage(int[,] original, int newRows, int newCols)
     {
         int rows = original.GetLength(0);
         int cols = original.GetLength(1);

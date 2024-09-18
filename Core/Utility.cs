@@ -279,17 +279,30 @@ namespace NeuralNetworks {
             return result;
         }
 
-        public static T[] Flatten<T>(T[,] matrix)
+        public static T[] Flatten<T>(T[,] matrix, bool rowMajor = true)
         {
             int rows = matrix.GetLength(0);
             int cols = matrix.GetLength(1);
             List<T> flattenedList = new List<T>(rows * cols);
 
-            for (int i = 0; i < rows; i++)
+            if (rowMajor)
+            {
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        flattenedList.Add(matrix[i, j]);
+                    }
+                }
+            }
+            else
             {
                 for (int j = 0; j < cols; j++)
                 {
-                    flattenedList.Add(matrix[i, j]);
+                    for (int i = 0; i < rows; i++)
+                    {
+                        flattenedList.Add(matrix[i, j]);
+                    }
                 }
             }
 

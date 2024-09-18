@@ -74,7 +74,7 @@ public class Game
 
     private void GetResults()
     {
-        int[] processedCanvas = Matrix.Flatten(canvas.ProcessCanvas());
+        int[] processedCanvas = Matrix.Flatten(canvas.ProcessCanvas(), rowMajor: false);
         double[] inputVector = processedCanvas.Select(x => x / 255.0).ToArray();
         double[] outputVector = network.ForwardPropagate(inputVector);
 

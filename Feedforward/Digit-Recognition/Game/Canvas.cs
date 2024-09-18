@@ -51,14 +51,14 @@ public class Canvas
         return null;
     }
 
-    public void Modify(int mouseX, int mouseY, bool isDraw)
+    public void Modify(int mouseX, int mouseY, int value, bool takeMax = false)
     {
         (int, int)? coordinates = GetCoordinates(mouseX, mouseY);
 
         if (coordinates != null)
         {
             (int x, int y) = (coordinates.Value);
-            pixels[x, y] = isDraw ? 255 : 0;
+            pixels[x, y] = takeMax ? Math.Max(pixels[x, y], value) : value;
         }
     }
 

@@ -18,13 +18,14 @@ public class Game
     public Vanilla network;
     public Canvas canvas;
 
-    public int[,] input; // processed pixels
-
+    public const Stroke.Type strokeType = Stroke.Type.Solid;
+    public Stroke stroke;
 
     public Game(Vanilla network)
     {
         this.network = network;
         canvas = new Canvas(HorPadding, VerPadding);
+        stroke = Stroke.Create(strokeType);
     }
 
     private void Update()
@@ -37,11 +38,11 @@ public class Game
     {
         if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
         {
-            canvas.Modify(GetMouseX(), GetMouseY(), true);
+            stroke.Draw(GetMouseX(), GetMouseY(), canvas);
         }
         else if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT))
         {
-            canvas.Modify(GetMouseX(), GetMouseY(), false);
+            canvas.Modify(GetMouseX(), GetMouseY(), 0);
         }
         else if (IsKeyPressed(KeyboardKey.KEY_SPACE))
         {

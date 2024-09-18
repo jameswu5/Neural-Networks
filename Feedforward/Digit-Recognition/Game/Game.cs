@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Raylib_cs;
 using static Raylib_cs.Raylib;
 
@@ -21,11 +22,20 @@ public class Game
     public const Stroke.Type strokeType = Stroke.Type.Solid;
     public Stroke stroke;
 
+    public const int FontSize = 35;
+    public const int Padding = 10;
+    public const int TextHorPadding = 800;
+    public const int TextVerPadding = (ScreenHeight - (FontSize + Padding) * 10 - Padding) / 2;
+
+    public (int, double)[] results;
+
     public Game(Vanilla network)
     {
         this.network = network;
         canvas = new Canvas(HorPadding, VerPadding);
         stroke = Stroke.Create(strokeType);
+        results = new (int, double)[10];
+        GetResults();
     }
 
     private void Update()
@@ -33,9 +43,10 @@ public class Game
         bool modified = HandleInput();
         if (modified)
         {
-            int[] input = Matrix.Flatten(canvas.ProcessCanvas());
+            GetResults();
         }
         canvas.Draw();
+        DisplayResults();
     }
 
     // Returns true if the canvas has been modified
@@ -59,6 +70,31 @@ public class Game
         }
 
         return false;
+    }
+
+    private void GetResults()
+    {
+        int[] processedCanvas = Matrix.Flatten(canvas.ProcessCanvas());
+        double[] inputVector = processedCanvas.Select(x => x / 255.0).ToArray();
+        double[] outputVector = network.ForwardPropagate(inputVector);
+
+        for (int i = 0; i < 10; i++)
+        {
+            results[i] = (i, outputVector[i]);
+        }
+
+        results = results.OrderByDescending(x => x.Item2).ToArray();
+    }
+
+    private void DisplayResults()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            Color color = i == 0 ? PastelGreen : Color.WHITE;
+
+            Raylib.DrawText($"{results[i].Item1}:", TextHorPadding, TextVerPadding + i * (FontSize + Padding), FontSize, color);
+            Raylib.DrawText($"{results[i].Item2:0.00}", TextHorPadding + 40, TextVerPadding + i * (FontSize + Padding), FontSize, color);
+        }
     }
 
     public void Simulate()

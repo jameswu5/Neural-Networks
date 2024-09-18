@@ -7,7 +7,7 @@ namespace NeuralNetworks.Feedforward;
 public class Game
 {
     public const int FrameRate = 240;
-    public const int ScreenWidth = 1380;
+    public const int ScreenWidth = 1080;
     public const int ScreenHeight = 720;
     public static readonly Color BackgroundColor = new(40, 40, 40, 255);
     public static readonly Color PastelGreen = new(193, 225, 193, 255);
@@ -17,7 +17,6 @@ public class Game
 
     public Vanilla network;
     public Canvas canvas;
-    public Canvas input; // for testing purposes
 
     public const Stroke.Type strokeType = Stroke.Type.Solid;
     public Stroke stroke;
@@ -26,7 +25,6 @@ public class Game
     {
         this.network = network;
         canvas = new Canvas(HorPadding, VerPadding);
-        input = new Canvas(HorPadding * 2 + Canvas.CanvasLength, VerPadding);
         stroke = Stroke.Create(strokeType);
     }
 
@@ -35,10 +33,9 @@ public class Game
         bool modified = HandleInput();
         if (modified)
         {
-            input.pixels = canvas.ProcessCanvas();
+            int[] input = Matrix.Flatten(canvas.ProcessCanvas());
         }
         canvas.Draw();
-        input.Draw();
     }
 
     // Returns true if the canvas has been modified

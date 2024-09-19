@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace NeuralNetworks {
     public static class Matrix {
-
         public static double[,] Add(double[,] matrix1, double[,] matrix2) {
 
             if (matrix1.GetLength(0) != matrix2.GetLength(0) || matrix1.GetLength(1) != matrix2.GetLength(1)) {
@@ -278,6 +277,67 @@ namespace NeuralNetworks {
                 }
             }
             return result;
+        }
+
+        public static T[] Flatten<T>(T[,] matrix, bool rowMajor = true)
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+            List<T> flattenedList = new List<T>(rows * cols);
+
+            if (rowMajor)
+            {
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        flattenedList.Add(matrix[i, j]);
+                    }
+                }
+            }
+            else
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    for (int i = 0; i < rows; i++)
+                    {
+                        flattenedList.Add(matrix[i, j]);
+                    }
+                }
+            }
+
+            return flattenedList.ToArray();
+        }
+
+        public static T[,] Unflatten<T>(T[] array, int rows, int cols, bool rowMajor = true)
+        {
+            T[,] matrix = new T[rows, cols];
+            int index = 0;
+
+            if (rowMajor)
+            {
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        matrix[i, j] = array[index];
+                        index++;
+                    }
+                }
+            }
+            else
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    for (int i = 0; i < rows; i++)
+                    {
+                        matrix[i, j] = array[index];
+                        index++;
+                    }
+                }
+            }
+
+            return matrix;
         }
     }
 

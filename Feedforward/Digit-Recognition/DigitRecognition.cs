@@ -123,5 +123,10 @@ namespace NeuralNetworks.Feedforward {
 
             network.SaveNetwork(path);
         }
+
+        public static void PlayGame() {
+            Game game = new(new Vanilla(path));
+            game.Simulate();
+        }
     }
 }

@@ -119,4 +119,13 @@ public class Game
 
         CloseWindow();
     }
+
+    private void LoadImage(int index)
+    {
+        List<Image> images = DigitDataReader.ReadTestData();
+        double[] data = images[index].dataArray;
+        int[] pixels = data.Select(d => (int)d).ToArray();
+        foreach(int pixel in pixels)
+        canvas.pixels = Matrix.Unflatten(pixels, DefaultResolution, DefaultResolution, rowMajor: false);
+    }
 }

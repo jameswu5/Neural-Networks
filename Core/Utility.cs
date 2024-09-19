@@ -308,6 +308,37 @@ namespace NeuralNetworks {
 
             return flattenedList.ToArray();
         }
+
+        public static T[,] Unflatten<T>(T[] array, int rows, int cols, bool rowMajor = true)
+        {
+            T[,] matrix = new T[rows, cols];
+            int index = 0;
+
+            if (rowMajor)
+            {
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < cols; j++)
+                    {
+                        matrix[i, j] = array[index];
+                        index++;
+                    }
+                }
+            }
+            else
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    for (int i = 0; i < rows; i++)
+                    {
+                        matrix[i, j] = array[index];
+                        index++;
+                    }
+                }
+            }
+
+            return matrix;
+        }
     }
 
     public static class Utility {

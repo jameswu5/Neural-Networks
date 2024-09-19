@@ -13,11 +13,14 @@ public class Game
     public static readonly Color BackgroundColor = new(40, 40, 40, 255);
     public static readonly Color PastelGreen = new(193, 225, 193, 255);
 
+    public const int DefaultResolution = 28;
+    public const int DefaultPixelSize = 20;
     public const int HorPadding = 80;
     public const int VerPadding = 80;
 
     public Vanilla network;
     public Canvas canvas;
+    public Canvas inputCanvas; // for testing on the processed image
 
     public const Stroke.Type strokeType = Stroke.Type.Solid;
     public Stroke stroke;
@@ -32,7 +35,8 @@ public class Game
     public Game(Vanilla network)
     {
         this.network = network;
-        canvas = new Canvas(HorPadding, VerPadding);
+        canvas = new Canvas(DefaultResolution, DefaultPixelSize, HorPadding, VerPadding);
+        inputCanvas = new Canvas(DefaultResolution, 10, HorPadding * 2 + canvas.canvasLength, VerPadding);
         stroke = Stroke.Create(strokeType);
         results = new (int, double)[10];
         GetResults();
@@ -46,6 +50,7 @@ public class Game
             GetResults();
         }
         canvas.Draw();
+        // inputCanvas.Draw();
         DisplayResults();
     }
 
@@ -74,8 +79,10 @@ public class Game
 
     private void GetResults()
     {
-        int[] processedCanvas = Matrix.Flatten(canvas.ProcessCanvas(), rowMajor: false);
-        double[] inputVector = processedCanvas.Select(x => x / 255.0).ToArray();
+        int[,] processedCanvas = canvas.ProcessCanvas();
+        inputCanvas.pixels = processedCanvas;
+        int[] flattenedCanvas = Matrix.Flatten(processedCanvas, rowMajor: false);
+        double[] inputVector = flattenedCanvas.Select(x => x / 255.0).ToArray();
         double[] outputVector = network.ForwardPropagate(inputVector);
 
         for (int i = 0; i < 10; i++)

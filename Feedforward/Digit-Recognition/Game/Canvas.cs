@@ -6,44 +6,47 @@ namespace NeuralNetworks.Feedforward;
 
 public class Canvas
 {
-    public const int Resolution = 28;
-    public const int SideLength = 20;
-    public const int CanvasLength = Resolution * SideLength;
+    public int resolution = 28;
+    public int sideLength = 20;
+    public int canvasLength;
 
-    private int horOffset;
-    private int verOffset;
+    private readonly int horOffset;
+    private readonly int verOffset;
 
     public int[,] pixels;
 
-    public Canvas(int horOffset, int verOffset, int[,]? pixels = null)
+    public Canvas(int resolution, int sideLength, int horOffset, int verOffset, int[,]? pixels = null)
     {
+        this.resolution = resolution;
+        this.sideLength = sideLength;
+        canvasLength = resolution * sideLength;
         this.horOffset = horOffset;
         this.verOffset = verOffset;
-        this.pixels = pixels ?? new int[Resolution, Resolution];
+        this.pixels = pixels ?? new int[resolution, resolution];
     }
 
     public void Draw()
     {
         // Draw pixels
-        for (int x = 0; x < Resolution; x++)
+        for (int x = 0; x < resolution; x++)
         {
-            for (int y = 0; y < Resolution; y++)
+            for (int y = 0; y < resolution; y++)
             {
                 int value = pixels[x, y];
-                DrawRectangle(horOffset + x * SideLength, verOffset + y * SideLength, SideLength, SideLength, new Color(value, value, value, 255));
+                DrawRectangle(horOffset + x * sideLength, verOffset + y * sideLength, sideLength, sideLength, new Color(value, value, value, 255));
             }
         }
 
         // Draw outline
-        DrawRectangleLines(horOffset, verOffset, CanvasLength, CanvasLength, Color.WHITE);
+        DrawRectangleLines(horOffset, verOffset, canvasLength, canvasLength, Color.WHITE);
     }
 
     private (int, int)? GetCoordinates(int x, int y)
     {
-        int xCoord = (x - horOffset) / SideLength;
-        int yCoord = (y - verOffset) / SideLength;
+        int xCoord = (x - horOffset) / sideLength;
+        int yCoord = (y - verOffset) / sideLength;
 
-        if (xCoord >= 0 && xCoord < Resolution && yCoord >= 0 && yCoord < Resolution)
+        if (xCoord >= 0 && xCoord < resolution && yCoord >= 0 && yCoord < resolution)
         {
             return (xCoord, yCoord);
         }

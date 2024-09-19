@@ -35,9 +35,9 @@ public class BrushStroke : Stroke
         canvas.Modify(mouseX, mouseY, 255);
         
         // Draw surrounding pixels at half brightness
-        canvas.Modify(mouseX + Canvas.SideLength, mouseY, 128, true);
-        canvas.Modify(mouseX - Canvas.SideLength, mouseY, 128, true);
-        canvas.Modify(mouseX, mouseY + Canvas.SideLength, 128, true);
-        canvas.Modify(mouseX, mouseY - Canvas.SideLength, 128, true);
+        canvas.Modify(mouseX + canvas.sideLength, mouseY, 128, true);
+        canvas.Modify(mouseX - canvas.sideLength, mouseY, 128, true);
+        canvas.Modify(mouseX, mouseY + canvas.sideLength, 128, true);
+        canvas.Modify(mouseX, mouseY - canvas.sideLength, 128, true);
     }
 }
